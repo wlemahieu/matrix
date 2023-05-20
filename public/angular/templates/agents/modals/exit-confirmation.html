@@ -1,0 +1,28 @@
+<div ng-controller="sidebarCtrl" id="exit-confirmation" class="ui basic modal">
+   <div ng-cloak ng-show="!loading" class="header">
+      Exit the Matrix?
+   </div>
+   <div class="image content">
+      <div ng-cloak ng-show="!loading" class="image">
+         <i class="wait icon"></i>
+      </div>
+      <div ng-cloak ng-show="loading" class="image">
+         <i class="loading spinner icon"></i>
+      </div>
+      <div ng-cloak ng-show="!loading" class="description">
+         <p>Be sure to <strong>end your current interactions</strong> prior to exiting.</p>
+      </div>
+   </div>
+   <div ng-cloak ng-show="!loading" class="actions">
+      <div class="two fluid ui inverted buttons">
+         <div ng-click="toggleExitConfirmModal(false)" class="ui blue basic inverted button">
+            <i class="thumbs down icon"></i>
+            No, go back.
+         </div>
+         <div ng-click="exit()" class="ui green basic inverted button">
+            <i class="thumbs up icon"></i>
+            Yes, exit.
+         </div>
+      </div>
+   </div>
+</div>

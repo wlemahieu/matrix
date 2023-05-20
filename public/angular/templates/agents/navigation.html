@@ -1,0 +1,222 @@
+<!-- Navigation Menu -->
+<div class="ui large pointing menu">
+
+    <!-- Centered Content -->
+    <div class="ui container" ng-controller="sidebarCtrl">
+
+        <!-- Hidden Sidebar -->
+        <a class="item" ng-click="showSidebar()">
+            <i class="arrow circle outline left icon"></i>
+        </a>
+
+        <!-- Exit User Emulation -->
+        <div ng-show="userinfo.emulating && !loading" ng-controller="agentEmulatorController as agentEmulatorCtrl" class="ui simple dropdown item ng-hide">
+
+            <i class="find icon"></i>
+
+            <!-- Users Dropdown -->
+            <div class="menu">
+                <a 
+                class="item" 
+                ng-click="agentEmulatorCtrl.emulate('exit')">
+                    <i class="clone icon"></i>
+                    <i class="sign out icon"></i>Exit Emulation
+                </a>
+            </div>
+        </div>
+
+        <div ng-show="!userinfo.emulating && api.agentStatuses.current_exception === 'none'" class="channelControl ng-hide" ng-controller="channelController as ctrl">
+
+            <!-- CHAT CONTROLS -->
+            <div class="ui tiny buttons">
+
+                <!-- enter chat queue -->
+                <button 
+                ng-disabled="ngDisabled.enterChats"
+                ng-hide="ngHide.enterChats"
+                ng-class="ngClass.enterChats"
+                ng-click="ctrl.sendCommand('chats', 'login')" 
+                class="ui button">
+                    <i class="comment icon"></i>
+                </button>
+
+                <!-- pause chat queue -->
+                <button
+                ng-disabled="ngDisabled.pauseChats"
+                ng-hide="ngHide.pauseChats"
+                ng-click="ctrl.sendCommand('chats', 'pause')"
+                class="ui button">
+                    <i class="pause icon"></i>
+                </button>
+
+                <!-- resume chat queue -->
+                <button
+                ng-disabled="ngDisabled.resumeChats"
+                ng-hide="ngHide.resumeChats"
+                ng-click="ctrl.sendCommand('chats', 'unpause')"
+                class="ui button">
+                    <i class="play icon"></i>
+                </button>
+
+                <!-- exit chat queue -->
+                <button
+                ng-disabled="ngDisabled.exitChats"
+                ng-hide="ngHide.exitChats"
+                ng-click="ctrl.sendCommand('chats', 'logout')"
+                class="ui button">
+                    <i class="close icon"></i>
+                </button>
+
+            </div>
+            <!-- end CHAT CONTROLS -->
+
+            <!-- PHONE CONTROLS -->
+            <div class="ui tiny buttons">
+
+                <!-- enter phone queue -->
+                <button 
+                ng-disabled="ngDisabled.enterPhones"
+                ng-hide="ngHide.enterPhones"
+                ng-class="ngClass.enterPhones"
+                ng-click="ctrl.sendCommand('phones', 'login')" 
+                class="ui button">
+                    <i class="phone icon"></i>
+                </button>
+
+                <!-- pause phone queue -->
+                <button
+                ng-disabled="ngDisabled.pausePhones"
+                ng-hide="ngHide.pausePhones"
+                ng-click="ctrl.sendCommand('phones', 'pause')"
+                class="ui button">
+                    <i class="pause icon"></i>
+                </button>
+
+                <!-- resume phone queue -->
+                <button
+                ng-disabled="ngDisabled.resumePhones"
+                ng-hide="ngHide.resumePhones"
+                ng-click="ctrl.sendCommand('phones', 'unpause')"
+                class="ui button">
+                    <i class="play icon"></i>
+                </button>
+
+                <!-- exit phones queue -->
+                <button
+                ng-disabled="ngDisabled.exitPhones"
+                ng-hide="ngHide.exitPhones"
+                ng-click="ctrl.sendCommand('phones', 'logout')"
+                class="ui button">
+                    <i class="close icon"></i>
+                </button>
+
+            </div>
+            <!-- end PHONE CONTROLS -->
+
+            <!-- TICKET CONTROLS -->
+            <div class="ui tiny buttons">
+
+                <!-- enter ticket queue -->
+                <button 
+                ng-disabled="ngDisabled.enterTickets"
+                ng-hide="ngHide.enterTickets"
+                ng-class="ngClass.enterTickets"
+                ng-click="ctrl.sendCommand('tickets', 'login')" 
+                class="ui button">
+                    <i class="ticket icon"></i>
+                </button>
+
+                <!-- exit ticket queue -->
+                <button
+                ng-disabled="ngDisabled.exitTickets"
+                ng-hide="ngHide.exitTickets"
+                ng-click="ctrl.sendCommand('tickets', 'logout')"
+                class="ui button">
+                    <i class="close icon"></i>
+                </button>
+
+            </div>
+            <!-- end TICKET CONTROLS -->
+        </div>
+
+        <!-- return from exception -->
+        <a
+        ng-show="api.agentStatuses.current_exception && api.agentStatuses.current_exception != 'none' && !userinfo.emulating"
+        ng-controller="exceptionsController as ctrl"
+        ng-disabled="loaders.channelControl == true"
+        ng-click="ctrl.endException()"
+        class="item ng-hide">
+            <i class="arrow circle outline left icon"></i> {{ api.agentStatuses.current_exception }}
+        </a>
+
+        <!-- take exceptions -->
+        <div
+        ng-show="api.agentStatuses.current_exception == 'none' && !userinfo.emulating"
+        ng-controller="exceptionsController as ctrl"
+        ng-disabled="api.agentStatuses.current_exception != 'none' || loaders.channelControl == true"
+        class="ui simple dropdown item ng-hide">
+
+            <i class="coffee icon"></i>
+
+            <div class="menu">
+                <a class="item" ng-click="ctrl.takeException('Break')">Break</a>
+                <a class="item" class="item" class="item" ng-click="ctrl.takeException('Lunch')">Lunch</a>
+                <a class="item" class="item" ng-click="ctrl.takeException('Team Meeting')">Team Meeting</a>
+                <a class="item" ng-click="ctrl.takeException('Dept Meeting')">Dept Meeting</a>
+                <a class="item" ng-click="ctrl.takeException('1on1')">1on1</a>
+                <a class="item" ng-click="ctrl.takeException('Self-Directed Time')">Self-Directed Time</a>
+                <a class="item" ng-click="ctrl.takeException('Other')">Other</a>
+            </div>
+        </div>
+
+        <!-- Universal Loader (goes away once all pages are self-interval-ing) -->
+        <div ng-show="loading" class="item ng-hide">
+            <i class="medium spinner loading icon"></i>
+        </div>
+
+        <!-- Date Range Dropdown -->
+        <div ng-show="!loading" ng-controller="DatePickersCtrl" ng-class="{ 'disabled' : loading }" class="ui simple dropdown item ng-hide">
+
+            <i class="calendar icon"></i>
+
+            <div class="menu">
+
+                <!-- Pay Periods Sub-menu -->
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    Periods&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="menu">
+                        <a ng-click="capturePayPeriod(payperiod.start, payperiod.end)" ng-repeat="payperiod in past_12_pay_periods" class="item">
+                            {{ payperiod.start }}  -  {{ payperiod.end }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quarters Sub-menu -->
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    Quarters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="menu">
+                        <a ng-click="capturePayPeriod(quarter.start, quarter.end)" ng-repeat="quarter in quarters_by_year" class="item">
+                            {{ quarter.title }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Datepicker -->
+        <div id="date-inputs" ng-controller="CustomDatePickerCtrl">
+            <md-datepicker ng-disabled="loading" ng-model="selectedDateRangeRaw.start" md-placeholder="MM/DD/YYYY"></md-datepicker>
+            <md-datepicker ng-disabled="loading" ng-model="selectedDateRangeRaw.end" md-placeholder="MM/DD/YYYY"></md-datepicker>
+        </div>
+
+        <!-- Logout (agents)-->
+        <a 
+        ng-show="userinfo.type == 'Agent' && !userinfo.emulating && !loading && api.agentStatuses.current_exception === 'none'"
+        class="item right ng-hide"
+        ng-click="toggleExitConfirmModal(true)">
+            Exit
+        </a>
+    </div>
+</div>

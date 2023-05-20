@@ -1,0 +1,134 @@
+<!-- view single checkin tab -->
+<div class="ng-hide" ng-show="tab === 'view'">
+
+	<!-- Content -->
+	<div class="ui grid">
+
+		<!-- Left Column -->
+		<div class="four wide column">
+
+			<div class="ui list">
+
+				<!-- Creation Date -->
+				<a class="item">
+					<i class="calendar icon"></i>
+					<div class="content">
+						<div class="header">Creation Date</div>
+						<div class="description">{{ singleCheckin.creation_date | date: 'MM/dd/yy @ h:mma' }}</div>
+					</div>
+				</a>
+
+				<!-- Interaction Date -->
+				<a class="item">
+					<i class="announcement icon"></i>
+					<div class="content">
+						<div class="header">Interaction Date</div>
+						<div class="description">{{ singleCheckin.interaction_date | date: 'MM/dd/yy' }}</div>
+					</div>
+				</a>
+
+				<!-- Lead Username -->
+				<a class="item">
+					<i class="user icon"></i>
+					<div class="content">
+						<div class="header">Lead Username</div>
+						<div class="description">{{ singleCheckin.lead_username }}</div>
+					</div>
+				</a>
+
+				<!-- Agent Username -->
+				<a class="item">
+					<i class="user icon"></i>
+					<div class="content">
+						<div class="header">Agent Username</div>
+						<div class="description">{{ singleCheckin.agent_username }}</div>
+					</div>
+				</a>
+
+				<!-- Account Number -->
+				<a class="item">
+					<i class="folder icon"></i>
+					<div class="content">
+						<div class="header">Account Number</div>
+						<div class="description">{{ singleCheckin.account_number }}</div>
+					</div>
+				</a>
+
+				<!-- Contact Type -->
+				<a class="item">
+					<i ng-cloak ng-show="singleCheckin.contact_type == 'Call'" class="phone icon"></i>
+					<i ng-cloak ng-show="singleCheckin.contact_type == 'Chat'" class="comment icon"></i>
+					<i ng-cloak ng-show="singleCheckin.contact_type == 'Ticket'" class="ticket icon"></i>
+					<div class="content">
+						<div class="header">Contact Type</div>
+						<div class="description">
+							{{ singleCheckin.contact_type }}
+						</div>
+					</div>
+				</a>
+
+				<!-- Support Number -->
+				<a class="item">
+					<i class="comment icon"></i>
+					<div class="content">
+						<div class="header">Support Number</div>
+						<div class="description">{{ singleCheckin.support_number }}</div>
+					</div>
+				</a>
+
+			</div>
+		</div>
+
+		<!-- Middle Column -->
+		<div class="six wide column">
+
+			<div class="ui list">
+
+				<a class="item" ng-repeat="item in qaProperties1Template">
+					<i ng-class="item.icon" class="icon"></i>
+					<div class="content">
+						<div class="header">{{ item.question }}</div>
+						<div class="description">
+							<i ng-show="singleCheckin[item.dbField]" class="thumbs up icon ng-hide" ng-class="item.yesColor"></i>
+							<i ng-show="!singleCheckin[item.dbField]" class="thumbs down icon ng-hide" ng-class="item.noColor"></i>
+							<i ng-show="singleCheckin[item.dbField] === ''" class="help icon ng-hide"></i>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+
+		<!-- Right Column -->
+		<div class="six wide column">
+
+			<div class="ui list">
+
+				<a class="item" ng-repeat="item in qaProperties2Template">
+					<i ng-class="item.icon" class="icon"></i>
+					<div class="content">
+						<div class="header">{{ item.question }}</div>
+						<div class="description">
+							<i ng-show="singleCheckin[item.dbField]" class="thumbs up icon ng-hide" ng-class="item.yesColor"></i>
+							<i ng-show="!singleCheckin[item.dbField]" class="thumbs down icon ng-hide" ng-class="item.noColor"></i>
+							<i ng-show="singleCheckin[item.dbField] === ''" class="help icon ng-hide"></i>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+		<!-- end right column -->
+
+		<!-- additional comments -->
+		<div class="ten wide column centered">
+			<div class="ui raised segment">
+				<a class="ui orange ribbon label">Additional Comments</a>
+				<br style="clear:both;"/><br/>
+				<p>
+					{{ singleCheckin.comment }}
+				</p>
+			</div>
+		</div>
+	</div>
+	<!-- end content -->
+</div>
+<!-- end view tab -->

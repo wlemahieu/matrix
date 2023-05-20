@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * Chats Unanswered
+ *
+ * Resposibile for recording all of the unanswered chats by hour by day.
+ */
+require '../application/model/Chats.php';
+require '../application/model/ChatGroups.php';
+require '../application/model/Logger.php';
+
+$Chats = new Chats($this->db);
+$ChatGroups = new ChatGroups($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$today = new DateTime('today');
+$date = $today->format('Y-m-d');
+
+foreach($ChatGroups->getChatGroups() as $group_id => $obj) {
+
+	$string = '?group_by=hour&group=' . $group_id . '&date_from=' . $date . '&date_to=' . $date;
+	$url = 'https://api.livechatinc.com/reports/queued_visitors' . $string;
+	$response = $Cron->livechatCurl($url);
+
+	// logging non-200s
+	$Logger->logAPI($response->httpcode);
+
+	if($response->httpcode === 200) {
+		foreach($response->data as $hour => $subObject) {
+
+			$payload = new stdClass();
+			$payload->date = $date;
+			$payload->group_id = $group_id;
+			$payload->hour = intval($hour);
+			$payload->total = $subObject->left_queue->count;
+
+			$Chats->upsertChatsUnanswered($payload);
+		}
+	}
+}

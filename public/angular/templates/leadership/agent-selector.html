@@ -1,0 +1,4 @@
+<select class="ui search selection dropdown" id="agent-selector" ng-model="selectedAgent" ng-change="selectAgent()">
+	<option selected>Select a user</option>
+	<option value="{{ user.username }}" ng-repeat="user in api.users | filter:usersFilter">{{ user.first_name }} {{ user.last_name }}</option>
+</select>

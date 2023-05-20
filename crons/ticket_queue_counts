@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * Ticket Queues Counts
+ *
+ * This cron is responsible for updating the information inside of the `ticket_queue_counts` table.
+ * 
+ */
+require '../application/model/TicketQueues.php';
+
+$Cron = new Cron();
+$TicketQueues = new TicketQueues($this->db);
+
+$response = $Cron->hostopsCurl('https://hostops.mediatemple.net/ticketmanager/ticketqueue.json');
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+foreach($response->data as $key => $value) {
+	$TicketQueues->upsertTicketQueueCount($key, $value);
+}

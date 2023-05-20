@@ -1,0 +1,242 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>User Profiles</h3>
+		</div>
+	</div>
+	
+	<!-- agent selector -->
+	<div class="row">
+		<div class="sixteen wide column">
+			<agent-selector></agent-selector>
+		</div>
+	</div>
+
+	<!-- content loader -->
+	<div ng-cloak ng-show="loaders.inline.userProfile || loaders.initial.userProfile" class="row">
+		<div class="sixteen wide column">
+			<i class="loading spinner icon"></i>&nbsp; Loading user profile for <strong>{{ selectedAgent }}</strong> ...
+		</div>
+	</div>
+
+	<!-- content -->
+	<div ng-cloak ng-show="selectedAgent && selectedAgent != 'Select a user' && !loaders.inline.userProfile && !loaders.initial.userProfile" class="row">
+		<div class="sixteen wide column">
+
+			<!-- tab toggle buttons -->
+			<div class="ui top attached tabular menu">
+				<a class="item active" data-tab="first">
+					<i class="table icon"></i> Details
+				</a>
+				<a class="item" data-tab="third">
+					<i class="unordered list icon"></i> History
+				</a>
+			</div>
+
+			<!-- start details tab -->
+			<div class="ui grid bottom attached tab segment active" data-tab="first">
+
+				<form ng-submit="save('profile')">
+
+					<!-- status selector -->
+					<div class="ui labeled input">
+						<div class="ui label">
+							Status
+						</div>
+						<select ng-model="api.userProfile.profile.active" class="ui dropdown">
+							<option value="1" ng-selected="api.userProfile.profile.active == '1'">
+								Active
+							</option>
+							<option value="0" ng-selected="api.userProfile.profile.active == '0'">
+								Inactive
+							</option>
+						</select>
+					</div>
+
+					<!-- department selector -->
+					<div class="ui labeled input">
+						<div class="ui label">
+							Department
+						</div>
+						<select ng-model="api.userProfile.profile.dept" class="ui dropdown">
+							<option ng-selected="api.userProfile.profile.dept == 'Sales'">Sales</option>
+							<option ng-selected="api.userProfile.profile.dept == 'CS'">CS</option>
+							<option ng-selected="api.userProfile.profile.dept == 'Other'">Other</option>
+						</select>
+					</div>
+					
+					<br style="clear:both;"/><br/>
+
+					<!-- first name input -->
+					<div class="ui labeled input">
+						<div class="ui label">
+							First Name
+						</div>
+						<input ng-model="api.userProfile.profile.first_name"/>
+					</div>
+
+					<!-- last name input -->
+					<div class="ui labeled input">
+						<div class="ui label">
+							Last Name
+						</div>
+						<input ng-model="api.userProfile.profile.last_name"/>
+					</div>
+
+					<br style="clear:both;"/><br/>
+
+					<!-- team name selector-->
+					<div class="ui labeled input">
+						<div class="ui label">
+							Team
+						</div>
+						<select ng-model="api.userProfile.profile.team" class="ui dropdown">
+							<option value="">No Team</option>
+							<option ng-repeat="obj in api.teams" ng-value="obj.name">{{ obj.name }}</option>
+						</select>
+					</div>
+
+					<!-- type selector-->
+					<div class="ui labeled input">
+						<div class="ui label">
+							Type
+						</div>
+						<select ng-model="api.userProfile.profile.type" class="ui dropdown">
+							<option ng-selected="api.userProfile.profile.type == 'Agent'">Agent</option>
+							<option ng-selected="api.userProfile.profile.type == 'Lead'">Lead</option>
+							<option ng-selected="api.userProfile.profile.type == 'Supervisor'">Supervisor</option>
+							<option ng-cloak ng-class="ng-hide" ng-show="userinfo.type == 'Manager'" ng-selected="api.userProfile.profile.type == 'Manager'">Manager</option>
+						</select>
+					</div>
+
+					<br style="clear:both;"/>
+
+					<!-- CS-only row of selectors -->
+					<div ng-show="api.userProfile.profile.dept == 'CS'" class="ng-hide">
+
+						<br style="clear:both;"/>
+
+						<!-- part-time / full-time selector -->
+						<div class="ui labeled input">
+							<div class="ui label">
+								Part/Full Time
+							</div>
+							<select ng-model="api.userProfile.profile.pt_or_ft" class="ui dropdown">
+								<option ng-selected="api.userProfile.profile.pt_or_ft == 'pt'" value="pt">Part-time</option>
+								<option ng-selected="api.userProfile.profile.pt_or_ft == 'ft'" value="ft">Full-time</option>
+							</select>
+						</div>
+
+						<!-- channel selector -->
+						<div class="ui labeled input">
+							<div class="ui label">
+								Channel
+							</div>
+							<select ng-model="api.userProfile.profile.channel" class="ui dropdown">
+								<option ng-selected="api.userProfile.profile.channel == 'all'">All</option>
+								<option ng-selected="api.userProfile.profile.channel == 'chats'">Chats</option>
+								<option ng-selected="api.userProfile.profile.channel == 'calls'">Calls</option>
+								<option ng-selected="api.userProfile.profile.channel == 'tickets'">Tickets</option>
+							</select>
+						</div>
+
+						<!-- level selector -->
+						<div class="ui labeled input">
+							<div class="ui label">
+								Level
+							</div>
+							<select ng-model="api.userProfile.profile.level" class="ui dropdown">
+								<option ng-selected="api.userProfile.profile.level == 'CS1'">CS1</option>
+								<option ng-selected="api.userProfile.profile.level == 'CS2'">CS2</option>
+								<option ng-selected="api.userProfile.profile.level == 'CS3'">CS3</option>
+								<option ng-selected="api.userProfile.profile.level == 'CS4'">CS4</option>
+								<option ng-selected="api.userProfile.profile.level == 'CS5'">CS5</option>
+							</select>
+						</div>
+
+					</div>
+
+					<br style="clear:both;"/>
+
+					<!-- chat id input -->
+					<div class="ui labeled input">
+						<div class="ui label">
+							Chat ID
+						</div>
+						<input ng-model="api.userProfile.profile.chat_id"/>
+					</div>
+
+					<!-- hostops id input -->
+					<div class="ui labeled input">
+						<div class="ui label">
+							HostOPs ID
+						</div>
+						<input ng-model="api.userProfile.profile.hostops_id"/>
+					</div>
+
+					<!-- asterisk id input -->
+					<div class="ui labeled input">
+						<div class="ui label">
+							Asterisk ID
+						</div>
+						<input ng-model="api.userProfile.profile.asterisk_id"/>
+					</div>
+					<br style="clear:both;"/><br/>
+
+					<div class="ui labeled input">
+						<div class="ui label">
+							Conversocial ID
+						</div>
+						<input ng-model="api.userProfile.profile.conversocial_id"/>
+					</div>
+
+					<div class="ui vertical labeled icon buttons">
+						<a ng-click="locateConversocialId()" class="ui button">
+							<i class="search icon"></i>
+							Find ID
+						</a>
+					</div>
+
+					<br style="clear:both;"/><br/>
+
+					<button
+					ng-disabled="button.active.disabled || loading"
+					ng-click="submit()"
+					ng-class="button.active.class"
+					class="ui huge button"
+					type="submit">
+						<i ng-class="button.active.icon" class="icon"></i>&nbsp;
+						{{ button.active.title }}
+					</button>
+				</form>
+				<!-- end form -->
+			</div>
+			<!-- end details tab -->
+
+			<!-- start history tab -->
+			<div class="ui bottom attached tab segment" data-tab="third">
+
+				<table style="font-size:.8em;" class="ui very basic compact table">
+					<thead>
+						<tr>
+							<th ng-repeat="(key, obj) in api.userProfile.profileHistory[0]">
+								{{ key }}
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="(key, obj) in api.userProfile.profileHistory">
+							<td ng-repeat="(subKey, val) in obj">
+								{{ val }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<!-- end history tab -->
+		</div>
+		<!-- end content -->
+	</div>
+	<!-- end grid -->
+</div>
+<conversocial-users-modal></conversocial-users-modal>

@@ -1,0 +1,155 @@
+<!-- Navigation Menu -->
+<div class="ui large secondary pointing menu">
+
+    <!-- Centered Content -->
+    <div class="ui container">
+
+        <!-- Hidden Sidebar -->
+        <a class="item" ng-click="showSidebar()">
+            <i class="arrow circle outline left icon"></i>
+        </a>
+
+        <!-- User Emulation -->
+        <div ng-hide="loading" ng-controller="agentEmulatorController as agentEmulatorCtrl" class="ui dropdown item">
+
+            <i class="find icon"></i>
+
+            <!-- Users Dropdown -->
+            <div class="menu scrollable-menu">
+                <a 
+                class="item" 
+                ng-click="agentEmulatorCtrl.emulate(agent.username)" 
+                ng-repeat="agent in api.users | filter: { type: 'Agent', dept: userinfo.dept, active: 1 }" 
+                value="{{ agent.username }}">
+                    {{ agent.first_name }} {{ agent.last_name }}
+                </a>
+            </div>
+        </div>
+
+        <!-- Leadership-wand Dropdown -->
+        <div ng-hide="loading" class="ui dropdown item">
+
+            <i class="wizard icon"></i>
+
+            <div class="menu">
+
+                <!-- 1on1s -->
+                <a href="/#/1on1s" ng-class="{'active': path == '1on1s'}" class="item">
+                    <i class="comments icon"></i>
+                    1on1s
+                </a>
+
+                <!-- Alerts -->
+                <a href="/#/alerts" ng-class="{'active': path == 'alerts'}" ng-show="userinfo.dept == 'CS'" class="item ng-hide">
+                    <i class="alarm icon"></i>
+                    Alerts
+                </a>
+
+                <!-- Attendance -->
+                <a href="/#/attendance" ng-class="{'active': path == 'attendance'}" class="item">
+                    <i class="clock icon"></i>
+                    Attendance
+                </a>
+
+                <!-- Checkins -->
+                <a href="/#/checkins" ng-class="{'active': path == 'checkins'}" ng-show="userinfo.dept == 'CS'"class="item ng-hide">
+                    <i class="heartbeat icon"></i>
+                    Checkins
+                </a>
+
+                <!-- Contribution Targets -->
+                <a href="/#/contributiontargets" ng-class="{'active': path == 'contributiontargets'}" ng-if="userinfo.dept == 'CS'" ng-show="userinfo.type == 'Manager'" class="item ng-hide">
+                    <i class="target icon"></i>
+                    Contribution Targets
+                </a>
+
+                <!-- Employee NPS -->
+                <a href="/#/enps" ng-class="{'active': path == 'enps'}" ng-if="userinfo.dept == 'CS'" ng-show="userinfo.type == 'Manager'" class="item ng-hide">
+                    <i class="line chart icon"></i>
+                    Employee NPS
+                </a>
+
+                <!-- Parameters -->
+                <a href="/#/parameters" ng-if="userinfo.dept == 'CS'" ng-class="{'active': path == 'parameters'}" class="item">
+                    <i class="options icon"></i>
+                    Parameters
+                </a>
+
+                <!-- Stats -->
+                <a href="/#/stats" ng-class="{'active': path == 'stats'}" class="item">
+                    <i class="calculator icon"></i>
+                    Stats
+                </a>
+
+                <!-- Teams -->
+                <a href="/#/teams" ng-class="{'active': path == 'teams'}" class="item">
+                    <i class="users icon"></i>
+                    Teams
+                </a>
+
+                <!-- User Profiles -->
+                <a href="/#/profiles" ng-class="{'active': path == 'profiles'}" class="item">
+                    <i class="user icon"></i>
+                    User Profiles
+                </a>
+
+                <!-- Schedules -->
+                <a href="/#/schedules" ng-class="{'active': path == 'schedules'}" class="item">
+                    <i class="calendar icon"></i>
+                    User Schedules
+                </a>
+
+                <!-- Workflow -->
+                <a href="/#/flow" ng-class="{'active': path == 'flow'}" class="item">
+                    <i class="refresh icon"></i>
+                    Workflow
+                </a>
+
+            </div>
+        </div>
+        <!-- End Leadership-wand Dropdown -->
+
+        <!-- Universal Loader -->
+        <div ng-show="loading" class="item ng-hide">
+            <i class="medium spinner loading icon"></i>
+        </div>
+
+        <!-- Date Range Dropdown -->
+        <div ng-show="!loading" ng-controller="DatePickersCtrl" class="ui dropdown item ng-hide">
+
+            <i ng-class="{'disabled': loading }" class="calendar icon"></i>
+
+            <div class="menu">
+
+                <!-- Pay Periods Sub-menu -->
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    Periods&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="menu">
+                        <a ng-click="capturePayPeriod(payperiod.start, payperiod.end)" ng-repeat="payperiod in past_12_pay_periods" class="item">
+                            {{ payperiod.start }}  -  {{ payperiod.end }}
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quarters Sub-menu -->
+                <div class="item">
+                    <i class="dropdown icon"></i>
+                    Quarters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="menu">
+                        <a ng-click="capturePayPeriod(quarter.start, quarter.end)" ng-repeat="quarter in quarters_by_year" class="item">
+                            {{ quarter.title }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Datepicker -->
+        <div id="date-inputs" ng-controller="CustomDatePickerCtrl">
+            <md-datepicker ng-disabled="loading" ng-model="selectedDateRangeRaw.start" md-placeholder="MM/DD/YYYY"></md-datepicker>
+            <md-datepicker ng-disabled="loading" ng-model="selectedDateRangeRaw.end" md-placeholder="MM/DD/YYYY"></md-datepicker>
+        </div>
+
+    </div>
+</div>

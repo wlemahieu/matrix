@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Conversocial Unread Messages
+ */
+require '../application/model/Conversocial.php';
+require '../application/model/Logger.php';
+
+$Conversocial = new Conversocial($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$url = 'https://api.conversocial.com/v1.1/conversations?status=unread&sort=newest_sort_date&fields=handling_times';
+
+$response = $Cron->conversocialCurl($url);
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+// update unread messages count
+if($response->httpcode === 200) {
+	$Conversocial->updateUnreadMessages(count($response->data->conversations));
+}

@@ -1,0 +1,24 @@
+<!-- PAYOUTS PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">Payouts</div>
+
+		<!-- content -->
+		<div class="description">
+
+			<span>Bonus Eligible Payout: ${{ api.statistics.period.bep_amount | number:2 }}</span>
+			<br style="clear:both"/>
+
+			<span>Actual Payout = ${{ api.statistics.period.bonus_payout | number:2 }}</span>
+			<br style="clear:both"/><br/>
+
+			<span><em>Payout Formula</em></span>
+			<br style="clear:both"/>
+
+			<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>BEP</strong> ({{ api.statistics.period.bep_amount | number:2 }}) x <strong>Bonus Multiplier</strong> ({{ api.statistics.sales.tier_multiplier }}) - <strong>Historic Refunds</strong> ({{ api.statistics.period.historic_refunds | number:2 }})</span>
+
+		</div>
+	</div>
+</div>

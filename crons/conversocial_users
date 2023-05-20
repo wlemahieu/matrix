@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Conversocial Users
+ */
+require '../application/model/Conversocial.php';
+require '../application/model/Logger.php';
+
+$Conversocial = new Conversocial($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$response = $Cron->conversocialCurl('https://api.conversocial.com/v1.1/users?fields=is_active,first_name,last_name');
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+// upsert users
+if($response->httpcode === 200) {
+	foreach($response->data->users as $user) {
+		$Conversocial->upsertUsers($user);
+	}
+}

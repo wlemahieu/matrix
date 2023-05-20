@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * Phone Unanswered
+ *
+ * Resposibile for recording all of the unanswered phone calls by hour by day.
+ */
+require '../application/model/Calls.php';
+require '../application/model/Logger.php';
+
+$Calls = new Calls($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$today = new DateTime('today');
+$date = $today->format('Ymd');
+
+$response = $Cron->astronomerCurl('https://astronomer.mtvoip.net/api/historic/queues?date='.$date);
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+if($response->httpcode === 200) {
+	foreach($response->data as $key => $object) {
+
+		foreach($object->hours as $hour => $hoursObject) {
+
+			$payload = new stdClass();
+			$payload->date = $date;
+			$payload->queue = $object->queue;
+			$payload->hour = $hour;
+			$payload->total = $hoursObject->unanswered_calls;
+
+			$Calls->upsertCallsUnanswered($payload);
+		}
+	}
+}

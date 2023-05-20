@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * Daily Volume by Agent
+ *
+ * Resposibile for counting all interactions and storing into `daily_contacts_by_agent`
+ */
+
+require '../application/model/Users.php';
+require '../application/model/Volume.php';
+
+$Volume = new Volume($this->db);
+$Users = new Users($this->db);
+$Cron = new Cron();
+
+// build time objects
+$todayObject = new DateTime('today');
+$today = $todayObject->format('Y-m-d');
+$startUnix = strtotime($today);
+
+// build payload
+$payload = new stdClass();
+$payload->username = -1;
+$payload->teamname = -1;
+$payload->dept = 'CS';
+$payload->type = 'Agent';
+$payload->active = -1;
+
+$users = $Users->fetch($payload);
+
+while(strtotime($today) >= $startUnix) {
+
+	$endUnix = $startUnix+86400;
+	$startFormatted = date('Y-m-d',$startUnix);
+
+	foreach($users as $obj) {
+
+		$payload = new stdClass();
+		$payload->username = $obj->username;
+		$payload->team = $obj->team;
+		$payload->dept = $obj->dept;
+		$payload->date = $startFormatted;
+		$payload->chats = $Volume->getVolume('chats', $obj->username, $startUnix, $endUnix);
+		$payload->calls = $Volume->getVolume('calls', $obj->username, $startUnix, $endUnix);
+		$payload->tickets = $Volume->getVolume('tickets', $obj->username, $startUnix, $endUnix);
+		$payload->total = $payload->chats + $payload->calls + $payload->tickets;
+
+		if($payload->total > 0) {
+			$Volume->upsertDailyContactsByAgent($payload);
+		}
+	}
+	$startUnix = $startUnix+86400;
+}

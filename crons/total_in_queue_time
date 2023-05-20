@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * Total In Queue Time
+ *
+ * Resposibile for calculating all of the total in queue time from each channel for each agents
+ */
+require '../application/model/Attendance.php';
+require '../application/model/Availability.php';
+require '../application/model/Logger.php';
+
+$Attendance = new Attendance($this->db);
+$Availability = new Availability($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$date = new DateTime('today');
+$livechat_date = $date->format('Y-m-d');
+$astronomer_date = $date->format('Ymd');
+
+// rebuilding-only
+//$livechat_date = '2016-03-16';
+//$astronomer_date = '20160316';
+
+$params = new stdClass();
+$params->today = $livechat_date;
+
+// iterate through agents who are clocked in today, then hit livechat url for each user. 
+// also fetch their ticket in_queue_time
+// (less efficient than our astronomer API call which gives us all agents at once, hence this loop)
+foreach($Attendance->agentsClockedIn($params) as $agent) {
+
+    $payload = new stdClass();
+    $payload->username = $agent->username;
+    $payload->availability_date = $livechat_date;
+
+    // ticket_in_queue_time duration
+    $results = $Availability->fetchAgentTicketAvailability($payload);
+    $payload->ticket_in_queue_time = $results->ticket_in_queue_time;
+    $Availability->updateTicketsAvailability($payload);
+
+    // chat_in_queue_time duration
+    $response = $Cron->livechatCurl('https://api.livechatinc.com/reports/availability?date_from='.$livechat_date.'&group_by=day&agent='.$agent->username.'@mediatemple.net');
+    
+    // logging non-200s
+    $Logger->logAPI($response->httpcode);
+
+    if($response->httpcode === 200) {
+        if(is_object($response->data)) {
+            if(is_object($response->data->$livechat_date)) {
+                $payload->chat_in_queue_time = round($response->data->$livechat_date->hours * 60 * 60);
+                $Availability->updateChatsAvailability($payload);
+            }
+        }
+    }
+}
+
+echo 'https://astronomer.mtvoip.net/api/historic/agents?date='.$astronomer_date;
+
+$response = $Cron->astronomerCurl('https://astronomer.mtvoip.net/api/historic/agents?date='.$astronomer_date);
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+// iterate through all agents provided to us directly from astronomer
+foreach($response->data as $key => $object) {
+    
+	$payload = new stdClass();
+    $payload->name = $object->name;
+    $payload->device_number = @$object->device_number;
+    $payload->call_in_queue_time = $object->in_queue_time;
+    $payload->availability_date = $livechat_date;
+    $Availability->updatePhonesAvailability($payload);
+}

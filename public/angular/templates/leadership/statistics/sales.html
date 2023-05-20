@@ -1,0 +1,400 @@
+<!-- LOADING ICON -->
+<div ng-cloak ng-show="loaders.initial.statistics === true && ( panelsFilter == 'Statistics' || panelsFilter == 'All' )">
+	Loading Statistics ... <i class="fa fa-spinner fa-spin"></i>
+</div>
+
+<!-- LEADERSHIP STATISTICS -->
+<div ng-controller="leadershipStatistics as statisticsCtrl" ng-cloak ng-show="loaders.initial.statistics === false && ( panelsFilter == 'Statistics' || panelsFilter == 'All' )">
+	
+	<!-- FIRST ROW, FILTERS -->
+	<div class="row">
+		<div class="col-lg-3 columns">
+			<div class="btn-group">
+				<label 
+				ng-class="{'btn-primary': statisticsFilter == 'floor', 'btn-default': statisticsFilter != 'floor' }" 
+				class="btn btn-sm" 
+				ng-model="statisticsFilter" 
+				btn-radio="'floor'">Floor</label>
+
+				<label 
+				ng-class="{'btn-primary': statisticsFilter == 'teams', 'btn-default': statisticsFilter != 'teams' }" 
+				class="btn btn-sm" 
+				ng-model="statisticsFilter" 
+				btn-radio="'teams'">Teams</label>
+
+				<label 
+				ng-class="{'btn-primary': statisticsFilter == 'agents', 'btn-default': statisticsFilter != 'agents' }" 
+				class="btn btn-sm" 
+				ng-model="statisticsFilter" 
+				btn-radio="'agents'">Agents</label>
+			</div>
+		</div>
+	</div>
+
+	<br style="clear:both;"/>
+
+	<!-- SECOND ROW, DATA -->
+	<div class="row">
+
+		<!-- ATTENDANCE -->
+		<div class="col-lg-3 columns">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<i ng-class="{'fa-calendar-check-o': loaders.inline.statistics === false, 'fa-spin fa-spinner': loaders.inline.statistics === true}" class="fa"></i>&nbsp;Attendance
+				</div>
+				<div class="panel-body scroll h30em">
+					<table class="table table-condensed">
+						<thead
+						ng-cloak
+						ng-show="statisticsFilter != 'floor'">
+							<tr>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.attendance = 'teamname'; reverseSort.team.attendance = !reverseSort.team.attendance">
+						         		Team
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.attendance = 'username'; reverseSort.agent.attendance = !reverseSort.agent.attendance">
+						         		Agent
+						        	</a>
+						        </th>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.attendance = 'absences'; reverseSort.team.attendance = !reverseSort.team.attendance">
+						         		Abs
+						        	</a>
+						        	<a
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.attendance = 'absences'; reverseSort.agent.attendance = !reverseSort.agent.attendance">
+						         		Abs
+						        	</a>
+						        </th>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.attendance = 'late_arrivals'; reverseSort.team.attendance = !reverseSort.team.attendance">
+						         		Late
+						        	</a>
+						        	<a
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.attendance = 'late_arrivals'; reverseSort.agent.attendance = !reverseSort.agent.attendance">
+						         		Late
+						        	</a>
+						        </th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+							ng-cloak
+							ng-show="statisticsFilter == 'floor' || statisticsFilter == 'all'">
+								<td>Floor</td>
+								<td>{{ api.statistics.dashboard.floor.absences }}</td>
+								<td>{{ api.statistics.dashboard.floor.late_arrivals }}</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+							ng-repeat="team in api.statistics.dashboard.teams | orderBy:orderByField.team.attendance:reverseSort.team.attendance">
+								<td>{{ team.teamname }}</td>
+								<td>{{ team.absences }}</td>
+								<td>{{ team.late_arrivals }}</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Supervisor' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )">
+								<td>Team</td>
+								<td>{{ api.statistics.dashboard.team.absences }}</td>
+								<td>{{ api.statistics.dashboard.team.late_arrivals }}</td>
+							</tr>
+							<tr 
+							ng-cloak
+							ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+							ng-repeat="agent in api.statistics.dashboard.agents | orderBy:orderByField.agent.attendance:reverseSort.agent.attendance">
+								<td>{{ agent.username }}</td>
+								<td>{{ agent.absences }}</td>
+								<td>{{ agent.late_arrivals }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- CSAT -->
+		<div class="col-lg-3 columns">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<i ng-class="{'fa-heart': loaders.inline.statistics === false, 'fa-spin fa-spinner': loaders.inline.statistics === true}" class="fa"></i>&nbsp;CSAT
+					</h3>
+				</div>
+				<div class="panel-body scroll h30em">
+					<table class="table table-condensed">
+						<thead
+						ng-cloak
+						ng-show="statisticsFilter != 'floor'">
+							<tr>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.csat = 'teamname'; reverseSort.team.csat = !reverseSort.team.csat">
+						         		Team
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.csat = 'username'; reverseSort.agent.csat = !reverseSort.agent.csat">
+						         		Agent
+						        	</a>
+								</th>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.csat = 'csat'; reverseSort.team.csat = !reverseSort.team.csat">
+						         		CSAT
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.csat = 'csat'; reverseSort.agent.csat = !reverseSort.agent.csat">
+						         		CSAT
+						        	</a>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+							ng-cloak
+							ng-show="statisticsFilter == 'floor' || statisticsFilter == 'all'">
+								<td>Floor</td>
+								<td>{{ api.statistics.dashboard.floor.csat | number:2 }}%</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+							ng-repeat="team in api.statistics.dashboard.teams | orderBy:orderByField.team.csat:reverseSort.team.csat">
+								<td>{{ team.teamname }}</td>
+								<td>{{ team.csat | number:2 }}%</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Supervisor' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )">
+								<td>Team</td>
+								<td>{{ api.statistics.dashboard.team.csat | number:2 }}%</td>
+							</tr>
+							<tr 
+							ng-cloak
+							ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+							ng-repeat="agent in api.statistics.dashboard.agents | orderBy:orderByField.agent.csat:reverseSort.agent.csat">
+								<td>{{ agent.username }}</td>
+								<td>{{ agent.csat | number:2 }}%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- AVAILABILITY -->
+		<div class="col-lg-3 columns">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<i ng-class="{'fa-hourglass': loaders.inline.statistics === false, 'fa-spin fa-spinner': loaders.inline.statistics === true}" class="fa"></i>&nbsp;Availability
+					</h3>
+				</div>
+				<div class="panel-body scroll h30em">
+					<table class="table table-condensed">
+						<thead
+						ng-cloak
+						ng-show="statisticsFilter != 'floor'">
+							<tr>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.availability = 'teamname'; reverseSort.team.availability = !reverseSort.team.availability">
+						         		Team
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.availability = 'username'; reverseSort.agent.availability = !reverseSort.agent.availability">
+						         		Agent
+						        	</a>
+								</th>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.availability = 'availability'; reverseSort.team.availability = !reverseSort.team.availability">
+						         		Availability
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.availability = 'availability'; reverseSort.agent.availability = !reverseSort.agent.availability">
+						         		Availability
+						        	</a>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+							ng-cloak
+							ng-show="statisticsFilter == 'floor' || statisticsFilter == 'all'">
+								<td>Floor</td>
+								<td>{{ api.statistics.dashboard.floor.availability | number:2 }}%</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+							ng-repeat="team in api.statistics.dashboard.teams | orderBy:orderByField.team.availability:reverseSort.team.availability">
+								<td>{{ team.teamname }}</td>
+								<td>{{ team.availability | number:2 }}%</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Supervisor' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )">
+								<td>Team</td>
+								<td>{{ api.statistics.dashboard.team.availability | number:2 }}%</td>
+							</tr>
+							<tr 
+							ng-cloak
+							ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+							ng-repeat="agent in api.statistics.dashboard.agents | orderBy:orderByField.agent.availability:reverseSort.agent.availability">
+								<td>{{ agent.username }}</td>
+								<td>{{ agent.availability | number:2 }}%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- Total Sales -->
+		<div class="col-lg-3 columns">
+			<div class="panel panel-success">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						<i ng-class="{'fa-money': loaders.inline.statistics === false, 'fa-spin fa-spinner': loaders.inline.statistics === true}" class="fa"></i>&nbsp;Sales
+					</h3>
+				</div>
+				<div class="panel-body scroll h30em">
+					<table class="table table-condensed">
+						<thead>
+							<tr>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.sales = 'teamname'; reverseSort.team.sales = !reverseSort.team.sales">
+						         		Team
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.sales = 'username'; reverseSort.agent.sales = !reverseSort.agent.sales">
+						         		Agent
+						        	</a>
+								</th>
+								<th ng-cloak ng-show="userinfo.dept != 'Sales'">
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.sales = 'contribution_expected'; reverseSort.team.sales = !reverseSort.team.sales">
+						         		Target
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.sales = 'contribution_expected'; reverseSort.agent.sales = !reverseSort.agent.sales">
+						         		Target
+						        	</a>
+								</th>
+								<th>
+									<a 
+									ng-cloak
+									ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+									ng-click="orderByField.team.sales = 'contribution_amount'; reverseSort.team.sales = !reverseSort.team.sales">
+						         		<span ng-cloak ng-show="userinfo.dept != 'Sales'">
+						         			Contribution
+						         		</span>
+						         		<span ng-cloak ng-show="userinfo.dept == 'Sales'">
+						         			Total Sales
+						         		</span>
+						        	</a>
+						        	<a 
+						        	ng-cloak
+									ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+									ng-click="orderByField.agent.sales = 'contribution_amount'; reverseSort.agent.sales = !reverseSort.agent.sales">
+						         		<span ng-cloak ng-show="userinfo.dept != 'Sales'">
+						         			Contribution
+						         		</span>
+						         		<span ng-cloak ng-show="userinfo.dept == 'Sales'">
+						         			Total
+						         		</span>
+						        	</a>
+								</th>
+								<th
+								ng-cloak
+								ng-show="( statisticsFilter == 'agents' || statisticsFilter == 'all' ) && userinfo.dept != 'Sales'">
+						        	<a ng-click="orderByField.agent.sales = 'eligible'; reverseSort.agent.sales = !reverseSort.agent.sales">
+						         		Eligible
+						        	</a>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+							ng-cloak
+							ng-show="statisticsFilter == 'floor' || statisticsFilter == 'all'">
+								<td>Floor</td>
+								<td ng-cloak ng-show="userinfo.dept != 'Sales'">${{ api.statistics.dashboard.floor.contribution_expected | number:2 }}</td>
+								<td>${{ api.statistics.dashboard.floor.contribution_amount | number:2 }}</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+							ng-repeat="team in api.statistics.dashboard.teams | orderBy:orderByField.team.sales:reverseSort.team.sales">
+								<td>{{ team.teamname }}</td>
+								<td ng-cloak ng-show="userinfo.dept != 'Sales'">${{ team.contribution_expected | number:2 }}</td>
+								<td>${{ team.contribution_amount | number:2 }}</td>
+							</tr>
+							<tr
+							ng-cloak
+							ng-show="userinfo.type == 'Supervisor' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )">
+								<td>Team</td>
+								<td ng-cloak ng-show="userinfo.dept != 'Sales'">${{ api.statistics.dashboard.team.contribution_expected | number:2 }}</td>
+								<td>${{ api.statistics.dashboard.team.contribution_amount | number:2 }}</td>
+							</tr>
+							<tr 
+							ng-cloak
+							ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+							ng-repeat="agent in api.statistics.dashboard.agents | orderBy:orderByField.agent.sales:reverseSort.agent.sales">
+								<td>{{ agent.username }}</td>
+								<td ng-cloak ng-show="userinfo.dept != 'Sales'">${{ agent.contribution_expected | number:2 }}</td>
+								<td>${{ agent.contribution_amount | number:2 }}</td>
+								<td ng-cloak ng-show="userinfo.dept != 'Sales'">
+									<i ng-if="agent.eligible == 1" class="fa fa-2x fa-check-circle text-success"></i>
+									<i ng-if="agent.eligible == 0" class="fa fa-2x fa-times-circle text-danger"></i>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

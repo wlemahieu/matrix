@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * Ticket Responses
+ *
+ * This cron is responsible for tracking how long it took for the first (mt) agent response to a customer for every ticket.
+ *
+ * First, we loop through tickets for the past 10 days.
+ * 
+ */
+require '../application/model/Semaphore.php';
+require '../application/model/TicketsFirstResponse.php';
+
+$Semaphore = new Semaphore($this->semaphore_db);
+$TicketsFirstResponse = new TicketsFirstResponse($this->db);
+
+foreach($Semaphore->pastDaysTickets(10) as $ticket) {
+
+	$payload = new stdClass();
+	$payload->ticket_id = $ticket->ticket_id;
+	$payload->date_customer_response = $ticket->date_entered;
+
+	$agent_response_time = $Semaphore->getAgentResponseTime($payload->ticket_id, $payload->date_customer_response);
+	
+	if(!empty($agent_response_time)) {
+		
+		$payload->date_agent_response = $agent_response_time->date_entered;
+		$payload->hostops_id = $agent_response_time->tech_id;
+
+ 		$TicketsFirstResponse->upsertFirstResponseTime($payload);
+ 	}
+}

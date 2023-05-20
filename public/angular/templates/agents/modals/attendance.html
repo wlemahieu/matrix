@@ -1,0 +1,45 @@
+<div id="attendance" class="ui small modal dynamic">
+	<div class="header">
+		Period Attendance
+	</div>
+	<div class="content">
+
+		<!-- filters -->
+		<div class="ui mini buttons">
+			<button 
+			ng-class="{ 'active': attendanceTab == 'clocks' }" 
+			class="ui button" 
+			ng-click="swapAttendanceView('clocks')">Clocks</button>
+
+			<button 
+			ng-class="{ 'active': attendanceTab == 'exceptions' }" 
+			class="ui button" 
+			ng-click="swapAttendanceView('exceptions')">Exceptions</button>
+		</div>
+		<!-- end filters -->
+
+		<table class="ui basic single line table">
+			<thead>
+				<tr>
+					<th>Mark</th>
+					<th>Started</th>
+					<th>Ended</th>
+					<th>Duration</th>
+					<th>Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="obj in attendanceSwapObject track by $index">
+					<td>
+						<span ng-show="attendanceTab == 'clocks'" class="ng-hide">Clock</span>
+						<span ng-show="attendanceTab == 'exceptions'" class="ng-hide">{{ obj.type }}</span>
+					</td>
+					<td>{{ obj.start | date: 'EEE @ h:mm a' }}</td>
+					<td>{{ obj.end | date: 'EEE @ h:mm a' }}</td>
+					<td>{{ duration | secondsReadable : 'short' : true }}
+					<td>{{ obj.start | date: 'MM/dd/yy' }}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

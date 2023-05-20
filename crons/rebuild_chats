@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Rebuild Chats with 0 for accounts
+ */
+require '../application/model/Chats.php';
+
+$Cron = new Cron($this->db);
+$Chats = new Chats($this->db);
+$chats = $Chats->emptyAccounts();
+$base_url = 'https://api.livechatinc.com/chats/';
+$i=0;
+
+foreach($chats as $key => $obj) {
+
+	$account = 0;
+	$contact = 0;
+
+	$url = $base_url . $obj->chat_id;
+	$response = $Cron->livechatCurl($url);
+
+	// only do this if there are actually any custom_variables sent with this chat
+	if(@$response->data->custom_variables) {
+
+		// iterate through the custom variables
+		foreach($response->data->custom_variables as $subkey => $subObj) {
+
+			print_R($subObj);
+
+			if($subObj->key == 'Account') {
+				$account = $subObj->value;
+			} elseif($subObj->key == 'Contact') {
+				$contact = $subObj->value;
+			}
+		}
+	}
+
+	// delivery payload
+	$payload = new stdClass();
+	$payload->account = $account;
+	$payload->contact = $contact;
+	$payload->chat_id = $obj->chat_id;
+
+	// update this chat
+	$Chats->updateEmptyAccounts($payload);
+
+	$i++;
+}

@@ -1,0 +1,56 @@
+<div ng-show="api.callerInfo.active" class="ng-hide">
+
+    <br style="clear:both;"/>
+
+    <div class="ui items segment">
+        <div class="item">
+            <div class="content">
+                <a class="header">
+                    <span class="ng-hide" ng-show="api.callerInfo.authed">
+                        Authenticated Caller
+                    </span>
+                    <span class="ng-hide" ng-show="!api.callerInfo.authed">
+                        Unauthenticated Non-CTC Caller
+                    </span>
+                </a>
+                <div class="meta">
+                    <span>{{ api.callerInfo.data.caller_id }}</span>
+                </div>
+                <div class="description">
+                    <ul class="ui list">
+                        <div class="item">
+                            <strong>Hold Time:</strong> {{ api.callerInfo.data.hold_time | secondsReadable : 'short' : true }}
+                        </div>
+
+                        <div class="item">
+                            <strong>Talk Time:</strong> {{ api.callerInfo.data.talk_time | secondsReadable : 'short' : true }}
+                        </div>
+
+                        <div class="item ng-hide" ng-show="api.callerInfo.data.account_id != null">
+                            <strong>Account</strong> {{ api.callerInfo.data.account_id }}
+                        </div>
+
+                        <div class="item ng-hide" ng-show="api.callerInfo.data.contact_id != null">
+                            <strong>Contact</strong> {{ api.callerInfo.data.contact_id }}
+                        </div>
+
+                        <div class="item ng-hide" ng-show="api.callerInfo.data.hostops_url != null">
+                            <a class="ui mini grey button" id="hostops_url" ng-href="{{ api.callerInfo.data.hostops_url }}" target="_blank">
+                                Open in HostOps <i class="link icon"></i>
+                            </a>
+                        </div>
+                    </ul>
+                </div>
+                <div ng-show="api.callerInfo.data.reason" class="extra ng-hide">
+                    <strong>Call Reason:</strong> {{ api.callerInfo.data.reason }} in HostOps <i class="link icon"></i>
+                    </a>
+                </div>
+                <div ng-show="api.callerInfo.data.hostops_url" class="extra ng-hide">
+                    <a class="ui mini grey button" id="hostops_url" ng-href="{{ api.callerInfo.data.hostops_url }}" target="_blank">
+                        Open in HostOps <i class="link icon"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+<!-- CONTRIBUTION PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">Contribution</div>
+
+		<!-- content -->
+		<div class="description">
+
+			<div class="ui mini green horizontal statistic">
+				<div class="value">
+					${{ api.statistics.period.contribution_amount | number:2 }}
+				</div>
+			</div>
+
+			<br style="clear:both;"/>
+
+			<div class="ui mini purple statistic">
+				<div class="value">
+					${{ api.statistics.period.contribution_expected | number:2 }}
+				</div>
+				<div class="label">
+					Goal
+				</div>
+			</div>
+
+			<br style="clear:both;"/>
+
+			<span>Bonus Multiplier: {{ api.statistics.period.tier_multiplier }}</span>
+
+			<!-- sales department goal completion percentage -->
+			<div class="ui list">
+				<div class="ui purple progress" id="sales_contribution_perc">
+					<div class="bar">
+						<div class="progress"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

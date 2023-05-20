@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Chat Groups
+ *
+ * Resposibile for recording all of the chat groups that exist in LiveChat.
+ */
+require '../application/model/ChatGroups.php';
+require '../application/model/Logger.php';
+
+$ChatGroups = new ChatGroups($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$response = $Cron->livechatCurl('https://api.livechatinc.com/groups');
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+if($response->httpcode === 200) {
+	foreach($response->data as $group) {
+		$payload = new stdClass();
+		$payload->group_id = @$group->id;
+		$payload->group_name = @$group->name;
+
+		$ChatGroups->upsertChatGroups($payload);
+	}
+}

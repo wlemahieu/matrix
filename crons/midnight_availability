@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * Midnight availability
+ *
+ * Resposibile for automatically clocking out an agent at midnight and clocking them back in.
+ */
+
+// load models
+require '../application/model/ClockingControl.php';
+require '../application/model/MidnightAvailability.php';
+
+// instantiate classes
+$ClockingControl = new ClockingControl($this->db);
+$MidnightAvailability = new MidnightAvailability($this->db);
+
+// create current timestamp (not using MySQL's NOW() because updateClock() is used for setting specific times - i.e. Agent Clocks via Leadership Dashboard
+$today = new DateTime('today');
+$datetime = $today->format('Y-m-d H:i:s');
+
+// grab all the "Sunrise" agents who are logged in...
+$sunrise_agents_logged_in = $MidnightAvailability->fetchClockedInSunriseAgents();
+
+// iterate through all of those agents...
+foreach($sunrise_agents_logged_in as $agent) {
+
+	// create a payload for updating the currently open clock for this agent we are iterating over...
+	$payload = new stdClass();
+	$payload->id = $agent->id;
+	$payload->active = -1;
+	$payload->start = -1;
+	$payload->end = $datetime;
+
+	// close out their existing clock using the payload
+	$ClockingControl->updateClock($payload);
+
+	// create a payload for adding a new clock for this agent
+	$payload = new stdClass();
+	$payload->username = $agent->agent_username;
+	$payload->start = $datetime;
+	$payload->end = NULL;
+	$payload->active = 1;
+
+	// add a new clock starting at midnight
+	$ClockingControl->addClock($payload);
+}

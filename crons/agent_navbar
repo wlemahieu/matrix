@@ -1,0 +1,235 @@
+<?php
+
+/*
+This cron fuels data to the `agent_navbar` table and is essential for keeping the agent's navbar real-time.
+
+First, we grab all active agents regardless of department and store their information in $usersData.
+Second, we map their username to their asterisk_id in $asterisk_id_username_map.
+Fetching last channels is pointless because it's already in the same table we're updating.
+*/
+
+require '../application/model/AgentNavbar.php';
+require '../application/model/ClockingControl.php';
+require '../application/model/Exceptions.php';
+require '../application/model/Logger.php';
+require '../application/model/Parameters.php';
+require '../application/model/Users.php';
+
+// instantiate models
+$AgentNavbar = new AgentNavbar($this->db);
+$ClockingControl = new ClockingControl($this->db);
+$Cron = new Cron();
+$Exceptions = new Exceptions($this->db);
+$Logger = new Logger();
+$Parameters = new Parameters($this->db);
+$Users = new Users($this->db);
+
+/*
+This script runs every 1 minute via cron.
+Within each 1 minute timeframe, this script loops over as many times as it can and ends after 1 minute.
+This model could be adopted for all crons running.
+*/
+
+$start = strtotime('now');
+$diff = 0;
+
+// if we are within the 1 minute of this cron running, loop over again.
+while($diff < 60) {
+
+	/**
+	 * Fetch all agents
+	 * 
+	 * Make sure we only deal with active agents, and make each agent a new object in the users array.
+	 * We need to also record the asterisk id so that when we populate phone statuses, we can map them to the agent.
+	 * Chat statuses will work based off username.
+	 *
+	 * usersData is an array of key-value pairs with the key being the username, and the value being the object of their user-details.
+	 * asterisk_id_username_map is simply for mapping the asterisk id to an agent's username.
+	 */
+	// build payload
+	$payload = new stdClass();
+	$payload->username = -1;
+	$payload->teamname = -1;
+	$payload->dept = -1;
+	$payload->type = 'Agent';
+	$payload->active = -1;
+
+	$results = $Users->fetch($payload);
+
+	$usersData = array();
+	$asterisk_id_username_map = array();
+
+	foreach($results as $obj) {
+
+		// populate users data array
+		$usersData[$obj->username] = new stdClass();
+		$usersData[$obj->username]->dept = $obj->dept;
+		$usersData[$obj->username]->username = $obj->username;
+		$usersData[$obj->username]->currently_clocked_in = $ClockingControl->checkClockedIn($obj->username);
+		$usersData[$obj->username]->asterisk_id = $obj->asterisk_id;
+
+		// since sales does not use the parameters system...
+		if($obj->dept == 'Sales') {
+			$usersData[$obj->username]->default_channel = 'all';
+		} 
+
+		// cs uses the parameter system, so fetch their default channel based on that.
+		else {
+			$usersData[$obj->username]->default_channel = $Parameters->getAgentChannel($obj->username);
+		}
+
+
+		// any current exception someone may be on
+		$usersData[$obj->username]->current_exception = $Exceptions->currentException($obj->username);
+		
+		// if there is no exception, mark that as 'none'. null is limited for case-statement clause usage in our upsert query.
+		if(is_null($usersData[$obj->username]->current_exception)) {
+			$usersData[$obj->username]->current_exception = 'none';
+		}
+
+		// populate asterisk-to-username map array
+		// $asterisk_id_username_map[1234] = 'bdole';
+		$asterisk_id_username_map[$obj->asterisk_id] = $obj->username;
+	}
+
+	/**
+	 * Fetch All Ticket Statuses
+	 */
+	$activeTicketAgents = $AgentNavbar->fetchActiveTicketAgents();
+	foreach($activeTicketAgents as $key => $obj) {
+		if(is_null($obj->clocked_out)) {
+			$tickets_status = 'ready';
+		} else {
+			$tickets_status = 'offline';
+		}
+		// insert ticket status to master array
+		$usersData[$obj->agent_username]->tickets_status = $tickets_status;
+	}
+
+	/**
+	 * Fetch All Phone Statuses
+	 */
+
+	$astronomer_url = 'https://astronomer.mtvoip.net/api/realtime/devices';
+	$response = $Cron->astronomerCurl($astronomer_url);
+
+	// logging non-200s
+	$Logger->logAPI($response->httpcode);
+
+	if($response->httpcode === 200) {
+		foreach($response->data as $key => $object) {
+
+			// define phone status
+
+			// if they are in their assigned queues, we know they are not offline, and one of two things...
+			if(!empty($object->queues)) {
+
+				// paused
+				if(!empty($object->paused)) {	
+					$phones_status = 'paused';
+				}
+				// not paused
+				else {
+					$phones_status = 'ready';
+				}
+			}
+			// offline
+			else {
+				$phones_status = 'offline';
+			}
+
+			// insert phone status to master array
+			// non-agents data will be dropped here since we're cross-referencing $asterisk_id_username_map which is an array of agents.
+			if(isset($asterisk_id_username_map[$object->device_number])) {
+				$username = $asterisk_id_username_map[$object->device_number];
+				$usersData[$username]->phones_status = $phones_status;
+			}
+		}
+	}
+
+	/**
+	 * Fetch All Chat Statuses
+	 */
+
+	$livechat_url = 'https://api.livechatinc.com/agents';
+	$response = $Cron->livechatCurl($livechat_url);
+
+	// logging non-200s
+	$Logger->logAPI($response->httpcode);
+
+	if($response->httpcode === 200) {
+		foreach($response->data as $agent) {
+
+		    $x = explode('@', $agent->login);
+		    $username = $x[0];
+
+		    // define chat status
+
+		    if($agent->status == 'not accepting chats') {
+				$chats_status = 'paused';
+			}
+			elseif($agent->status == 'accepting chats') {
+				$chats_status = 'ready';
+			}
+			else{
+				$chats_status = 'offline';
+			}
+
+			// insert chat status to master array
+			// non-agents data will be dropped here since we're cross-referencing $asterisk_id_username_map which is an array agents.
+			if(isset($usersData[$username])){
+				$usersData[$username]->chats_status = $chats_status;
+			}
+		}
+	}
+	
+	/**
+	 * Iterate through our usersData array of objects
+	 */
+	foreach($usersData as $username => $obj) {
+
+		//make sure there are no empty or null chat/phone statuses
+		if(empty($obj->chats_status) || is_null($obj->chats_status)) {
+			$obj->chats_status = 'offline';
+		}
+		if(empty($obj->phones_status) || is_null($obj->phones_status)) {
+			$obj->phones_status = 'offline';
+		}
+		if(empty($obj->tickets_status) || is_null($obj->tickets_status)) {
+			$obj->tickets_status = 'offline';
+		}
+
+		##########################
+		### START LIVE CHANNEL ###
+		##########################
+		if($obj->chats_status != 'offline' && $obj->phones_status != 'offline' && $obj->tickets_status != 'offline') {
+			$obj->live_channel = 'all';
+		}
+		elseif($obj->phones_status != 'offline') {
+			$obj->live_channel = 'phones';
+		}
+		elseif($obj->chats_status != 'offline') {
+			$obj->live_channel = 'chats';
+		}
+		elseif($obj->tickets_status != 'offline') {
+			$obj->live_channel = 'tickets';
+		}
+		else if($obj->chats_status == 'offline' && $obj->phones_status == 'offline' && $obj->tickets_status == 'offline') {
+			$obj->live_channel = 'none';
+		}
+
+		########################
+		### END LIVE CHANNEL ###
+		########################
+
+		// deliver payload
+		$AgentNavbar->upsertAgentNavbarData($obj);
+	}
+
+	// find the difference in time between now and the very first time this script was run and mark it.
+	// it will be immediately checked when this while() loop runs again after this line.
+	$diff = strtotime('now') - $start;
+}
+
+// remove records older than 1 minute (this means they are no longer an active agent, rarely happens but can.)
+$Cron->cleanTable('agent_navbar_data', NULL);

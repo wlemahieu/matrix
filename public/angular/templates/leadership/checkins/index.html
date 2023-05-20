@@ -1,0 +1,50 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Checkins</h3>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="sixteen wide column">
+			<!-- Loader -->
+			<div class="ng-hide" ng-show="loaders.initial.checkins">
+				<i class="big blue loading circle notched icon"></i> Loading Checkins...
+			</div>
+
+			<!-- Content -->
+			<div class="ng-hide" ng-show="!loaders.initial.checkins">
+	
+				<!-- Q&A Toggle -->
+				<div class="ui compact menu">
+					<a class="item" ng-click="toggleTab('checkins');" ng-class="{ 'active': tab == 'checkins' }">
+						<i class="list icon"></i>Checkins
+					</a>
+					<a class="item" ng-click="toggleTab('new');" ng-class="{ 'active': tab == 'new' }">
+						<i class="pencil icon"></i>New
+					</a>
+					<a ng-show="singleCheckin" class="item ng-hide" ng-class="{ 'active': tab == 'view' }">
+						<i class="eye icon"></i>Viewing
+					</a>
+					<a ng-show="singleCheckin && !singleCheckin.presented" ng-click="toggleManipulate('edit', singleCheckin.id);" class="item ng-hide">
+						<i class="edit icon"></i>Edit
+					</a>
+					<a ng-show="form && form.id" class="item ng-hide" ng-class="{ 'active': tab == 'edit' }">
+						<i class="edit icon"></i>Editing
+					</a>
+					<a ng-show="form && form.id" ng-click="view(form.id);" class="item ng-hide">
+						<i class="eye icon"></i>View
+					</a>
+					
+				</div>
+				
+				<br style="clear:both;"/><br/>
+
+				<!-- Tabs -->
+				<checkins></checkins>
+				<manipulate-checkin></manipulate-checkin>
+				<view-checkin></view-checkin>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,138 @@
+<!-- show checkins if there are some -->
+<div class="ui piled segment">
+
+	<!-- heading -->
+	<h3>Line Items</h3>
+
+	<!-- filters incomplete -->
+	<div class="ui mini buttons">
+		<button 
+		ng-class="{ 'blue': totalsFilter.class == 'all' }" 
+		class="ui button" 
+		ng-click="lineItemsFilter = { class: '!hist_refund' }; totalsFilter = { class: 'all' }">All</button>
+
+		<button 
+		ng-class="{ 'blue': totalsFilter.class == 'new' }" 
+		class="ui button" 
+		ng-click="lineItemsFilter = { class: 'new' }; totalsFilter = { class: 'new' }">New</button>
+
+		<button 
+		ng-class="{ 'blue': totalsFilter.class == 'renewal' }" 
+		class="ui button" 
+		ng-click="lineItemsFilter = { class: 'renewal' }; totalsFilter = { class: 'renewal' }">Renewal</button>
+
+		<button 
+		ng-class="{ 'blue': totalsFilter.class == 'refund' }" 
+		class="ui button" 
+		ng-click="lineItemsFilter = { class: 'refund' }; totalsFilter = { class: 'refund' }">Refund</button>
+
+		<button 
+		ng-class="{ 'blue': totalsFilter.class == 'hist_refund' }" 
+		class="ui button" 
+		ng-click="lineItemsFilter = { class: 'hist_refund' }; totalsFilter = { class: 'hist_refund' }">Historical Refunds</button>
+	</div>
+	<!-- end filters -->
+
+	<br style="clear:both"/><br/>
+
+	<!-- LINE ITEMS TABLE -->
+	<table id="salesli" class="ui single line table">
+
+		<thead>
+			<tr>
+				<th>
+					Sale Date
+				</th>
+				<th >
+					Inv / Order ID
+				</th>
+				<th>
+					New / Renewal
+				</th>
+				<th>
+					Order Type
+				</th>
+				<th>
+					Service
+				</th>
+				<th>
+					Paid
+				</th>
+				<th>
+					Credit
+				</th>
+				<th>
+					Refund
+				</th>
+				<th ng-show="userinfo.dept == 'CS'" class="ng-hide">
+					BEP
+				</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr ng-repeat="(key, array) in api.statistics.sales.line_items | filter: lineItemsFilter:true">
+				<td>
+					{{ array.saledate }}
+				</td>
+				<td>
+					{{ array.inv_order_id }}
+				</td>
+				<td>
+					{{ array.newrenewal }}
+				</td>
+				<td>
+					{{ array.order_type }}
+				</td>
+				<td>
+					{{ array.service }}
+				</td>
+				<td>
+					${{ array.paid | number:2 }}
+				</td>
+				<td>
+					${{ array.credit | number:2 }}
+				</td>
+				<td>
+					${{ array.refund | number:2 }}
+				</td>
+				<td ng-show="userinfo.dept == 'CS'" class="ng-hide">
+					${{ array.bep | number:2 }}
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td>
+					<strong>
+						Totals
+					</strong>
+				</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td>
+					<strong>
+						${{ api.statistics.sales.totals.paid | number:2 }}
+					</strong>
+				</td>
+				<td>
+					<strong>
+						${{ api.statistics.sales.totals.credit | number:2 }}
+					</strong>
+				</td>
+				<td>
+					<strong>
+						${{ api.statistics.sales.totals.refund | number:2 }}
+					</strong>
+				</td>
+				<td ng-show="userinfo.dept == 'CS'" class="ng-hide">
+					<strong>
+						${{ api.statistics.sales.totals.bep | number:2 }}
+					</strong>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+</div>

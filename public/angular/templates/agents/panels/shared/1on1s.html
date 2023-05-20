@@ -1,0 +1,54 @@
+<div class="ui comments">
+	<h3>
+		1on1s
+	</h3>
+
+	<table class="ui very basic single line table">
+		<thead>
+			<tr>
+				<th>
+					Date
+		        </th>
+				<th ng-show="userinfo.type === 'Manager'" class="ng-hide">
+					Lead
+				</th>
+				<th ng-show="userinfo.type === 'Manager' || userinfo.type === 'Supervisor'" class="ng-hide">
+					Agent
+		        </th>
+		        <th>
+					Status
+				</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="(key, obj) in api.oneonones.details | filter: oneOnOnesFilter | orderBy: 'finished': true track by $index">
+				<td>
+					{{ obj.finished | date: 'shortDate' }}
+				</td>
+				<td ng-show="userinfo.type === 'Manager'" class="ng-hide">
+					{{ obj.leadership_username }}
+				</td>
+				<td ng-show="userinfo.type === 'Manager' || userinfo.type === 'Supervisor'" class="ng-hide">
+					{{ obj.agent_username }}
+				</td>
+				<td>
+					<label class="ui green label ng-hide" ng-show="obj.accepted && obj.accepted !== 0">
+						Accepted
+					</label>
+					<label class="ui yellow label ng-hide" ng-show="!obj.accepted && obj.accepted !== 0">
+						Not Accepted
+					</label>
+					<label class="ui grey label ng-hide" ng-show="obj.accepted === 0">
+						Pre-Acceptance
+					</label>
+				</td>
+				<td>
+					<a ng-click="viewOneOnOne(obj.id)" class="ui tiny button">
+						<i class="eye icon"></i>
+					</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

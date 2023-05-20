@@ -1,0 +1,42 @@
+<div class="ui grid container">
+
+	<!-- 1st ROW FOR EMULATORS -->
+ 	<div ng-show="userinfo.emulating" class="sixteen wide column ng-hide">
+		Agent Dashboard for: <strong>{{ userinfo.username | uppercase }}</strong>
+	</div>
+
+	<!-- 1ST ROW -->
+ 	<div class="sixteen wide column">
+ 		<caller-info></caller-info>
+ 	</div>
+
+	<!-- 2ND ROW -->
+	<div class="sixteen wide column row1">
+		<line-item-sales></line-item-sales>
+	</div>
+
+	<!-- 3RD ROW -->
+	<div class="four wide column">
+ 		<sales></sales>
+ 	</div>
+ 	<div class="four wide column">
+ 		<csat-breakdown></csat-breakdown>
+ 	</div>
+ 	<div class="four wide column row1">
+ 		<attendance></attendance>
+ 	</div>
+ 	<div class="four wide column row1">
+ 		<customer-comments></customer-comments>
+ 	</div>
+
+ 	<!-- 4TH ROW -->
+ 	<div class="four wide column">
+ 		<one-on-ones></one-on-ones>
+ 	</div>
+ 	<div class="four wide column">
+ 		<sales-contacts></sales-contacts>
+ 	</div>
+</div>
+
+<exit-confirmation-modal></exit-confirmation-modal>
+<attendance-modal></attendance-modal>

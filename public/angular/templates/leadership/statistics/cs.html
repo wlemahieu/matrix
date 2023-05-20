@@ -1,0 +1,279 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Stats</h3>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="sixteen wide column">
+			<!-- Loader -->
+			<div ng-hide="loaders.initial.statistics === false">
+				Loading Statistics...
+			</div>
+
+			<!-- Content -->
+			<div ng-cloak ng-show="loaders.initial.statistics === false">
+				<div class="ui grid container">
+
+					<br style="clear:both;"/><br/>
+
+					<!-- Filters for agents -->
+					<div class="row">
+						<div class="eigth wide column">
+							<!-- filter by team -->
+							<div class="ui buttons">
+								<button ng-class="{ 'blue': statisticsFilter == 'floor' }" class="ui button" ng-click="statisticsFilterChange('floor')">Floor</button>
+								<button ng-class="{ 'blue': statisticsFilter == 'teams' }" class="ui button" ng-click="statisticsFilterChange('teams')">Teams</button>
+								<button ng-class="{ 'blue': statisticsFilter == 'agents' }" class="ui button" ng-click="statisticsFilterChange('agents')">Agents</button>
+							</div>
+						</div>
+					</div>
+
+					<div class="row ng-hide" ng-show="statisticsFilter == 'agents'">
+						<div class="eigth wide column">
+							<!-- filter by agent type -->
+							<div class="ui icon top left pointing dropdown button filter">
+								<i class="options icon"></i>
+								<span class="text">{{ filtersVerbose.level }}</span>
+								<div class="menu">
+									<div class="header">
+										<i class="tags icon"></i>
+										Filter by level
+									</div>
+									<div class="item" ng-click="updateFilter('level')">
+										All CS Levels
+									</div>
+									<div class="item" ng-click="updateFilter('level', 'CS1')">
+										CS1
+									</div>
+									<div class="item" ng-click="updateFilter('level', 'CS2')">
+										CS2
+									</div>
+									<div class="item" ng-click="updateFilter('level', 'CS3')">
+										CS3
+									</div>
+									<div class="item" ng-click="updateFilter('level', 'CS4')">
+										CS4
+									</div>
+								</div>
+							</div>
+
+							<!-- filter by team -->
+							<div class="ui icon top left pointing dropdown button filter">
+								<i class="users icon"></i>
+								<span class="text">{{ filtersVerbose.team }}</span>
+								<div class="menu">
+									<div class="header">
+										<i class="tags icon"></i>
+										Filter by team
+									</div>
+									<div class="item" ng-click="updateFilter('team')">
+										All Teams
+									</div>
+									<div ng-repeat="team in api.teams | filter:teamsFilter track by $index" class="item" ng-click="updateFilter('team', team.name )">
+										{{ team.name }}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- end filters -->
+
+					<br style="clear:both;"/><br/><br/><br/><br/>
+
+					<div class="row">
+						<div class="sixteen wide column">
+							<div class="ui item">
+
+								<table class="ui very basic compact table">
+									<thead>
+										<tr>
+											<th>
+												<a 
+												ng-cloak
+												ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'floor' || statisticsFilter == 'all' )">
+							         		Floor
+							        	</a>
+												<a 
+												ng-cloak
+												ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+												ng-click="orderByField('teamname')">
+							         		Team
+							        	</a>
+							        	<a 
+							        	ng-cloak
+												ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+												ng-click="orderByField('username')">
+							         		Agent
+							        	</a>
+									    </th>
+											<th>	
+							        	<a ng-click="orderByField('absences')">
+							         		Absences
+							        	</a>
+								        </th>
+											<th>
+												<a ng-click="orderByField('late_arrivals')">
+									        Lates
+									      </a>
+									    </th>
+									    <th>
+							        	<a ng-click="orderByField('csat_overall')" class="tooltip" data-content="Customer Satisfaction Rating">
+							         		CSAT
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('availability')">
+							         		Availability
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('cpd')" class="tooltip" data-content="Contacts Per Day">
+							         		CPD
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('volume_overall')" class="tooltip" data-content="Overall Volume">
+							         		Volume
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('volume_chats')" class="tooltip" data-content="Chats Volume">
+							         		Chats 
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('volume_calls')" class="tooltip" data-content="Calls Volume">
+							         		Calls 
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('volume_tickets')" class="tooltip" data-content="Tickets Volume">
+							         		Tickets 
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('contribution_expected')" class="tooltip" data-content="Contribution Target">
+							         		C-Target
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('contribution_amount')" class="tooltip" data-content="Contribution Amount">
+							         		C-Amount
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('available_hours')" class="tooltip" data-content="Available Hours">
+							         		AH
+							        	</a>
+											</th>
+											<th 
+											ng-cloak
+											ng-show="statisticsFilter == 'agents'">
+							        	<a ng-click="orderByField('eligible')" class="tooltip" data-content="Bonus Payout Eligibility">
+							         		Eligibility
+							        	</a>
+											</th>
+											<th>
+							        	<a ng-click="orderByField('expected_available_day')" class="tooltip" data-content="Daily Expected Available Hours">
+							         		DEAH
+							        	</a>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+
+										<!-- FLOOR STATS -->
+										<tr
+										ng-cloak
+										ng-show="statisticsFilter == 'floor' || statisticsFilter == 'all'">
+											<td>Floor</td>
+											<td>{{ api.statistics.floor.absences }}</td>
+											<td>{{ api.statistics.floor.late_arrivals }}</td>
+											<td>{{ api.statistics.floor.csat_overall | number:2 }}%</td>
+											<td>{{ api.statistics.floor.availability | number:2 }}%</td>
+											<td>{{ api.statistics.floor.cpd | number:2 }}</td>
+											<td>{{ api.statistics.floor.volume_overall }}</td>
+											<td>{{ api.statistics.floor.volume_chats }}</td>
+											<td>{{ api.statistics.floor.volume_calls }}</td>
+											<td>{{ api.statistics.floor.volume_tickets }}</td>
+											<td>$ {{ api.statistics.floor.contribution_expected| number:2 }}</td>
+											<td>$ {{ api.statistics.floor.contribution_amount | number:2 }}</td>
+											<td>{{ api.statistics.floor.available_hours | number:2 }}</td>
+											<td>{{ api.statistics.floor.expected_available_day | number:2 }}</td>
+										</tr>
+
+										<!-- TEAM STATS -->
+										<tr
+										ng-cloak
+										ng-show="userinfo.type == 'Manager' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )"
+										ng-repeat="team in api.statistics.teams | orderBy:orderByFieldName:reverseSort">
+											<td>{{ team.groupby }}</td>
+											<td>{{ team.absences }}</td>
+											<td>{{ team.late_arrivals }}</td>
+											<td>{{ team.csat_overall | number:2 }}%</td>
+											<td>{{ team.availability | number:2 }}%</td>
+											<td>{{ team.cpd | number:2 }}</td>
+											<td>{{ team.volume_overall }}</td>
+											<td>{{ team.volume_chats }}</td>
+											<td>{{ team.volume_calls }}</td>
+											<td>{{ team.volume_tickets }}</td>
+											<td>$ {{ team.contribution_expected | number:2 }}</td>
+											<td>$ {{ team.contribution_amount | number:2 }}</td>
+											<td>{{ team.available_hours | number:2 }}</td>
+											<td>{{ team.expected_available_day | number:2 }}</td>
+										</tr>
+										<tr
+										ng-cloak
+										ng-show="userinfo.type == 'Supervisor' && ( statisticsFilter == 'teams' || statisticsFilter == 'all' )">
+											<td>Team</td>
+											<td>{{ api.statistics.team.absences }}</td>
+											<td>{{ api.statistics.team.late_arrivals }}</td>
+											<td>{{ api.statistics.team.csat_overall | number:2 }}%</td>
+											<td>{{ api.statistics.team.availability | number:2 }}%</td>
+											<td>{{ api.statistics.team.cpd | number:2 }}</td>
+											<td>{{ api.statistics.team.volume_overall }}</td>
+											<td>{{ api.statistics.team.volume_chats }}</td>
+											<td>{{ api.statistics.team.volume_calls }}</td>
+											<td>{{ api.statistics.team.volume_tickets }}</td>
+											<td>$ {{ api.statistics.team.contribution_expected | number:2 }}</td>
+											<td>$ {{ api.statistics.team.contribution_amount | number:2 }}</td>
+											<td>{{ api.statistics.team.available_hours | number:2 }}</td>
+											<td>{{ api.statistics.team.expected_available_day | number:2 }}</td>
+										</tr>
+
+										<!-- AGENT STATS -->
+										<tr 
+										ng-cloak
+										ng-show="statisticsFilter == 'agents' || statisticsFilter == 'all'"
+										ng-repeat="agent in api.statistics.agents | orderBy:orderByFieldName:reverseSort | filter:filters">
+											<td>{{ agent.username }}</td>
+											<td>{{ agent.absences }}</td>
+											<td>{{ agent.late_arrivals }}</td>
+											<td>{{ agent.csat_overall | number:2 }}%</td>
+											<td>{{ agent.availability | number:2 }}%</td>
+											<td>{{ agent.cpd | number:2 }}</td>
+											<td>{{ agent.volume_overall }}</td>
+											<td>{{ agent.volume_chats }}</td>
+											<td>{{ agent.volume_calls }}</td>
+											<td>{{ agent.volume_tickets }}</td>
+											<td>$ {{ agent.contribution_expected | number:2 }}</td>
+											<td>$ {{ agent.contribution_amount | number:2 }}</td>
+											<td>{{ agent.available_hours | number:2 }}</td>
+											<td>
+												<div ng-cloak ng-show="agent.eligible"class="ui green horizontal label">Eligible</div>
+												<div ng-cloak ng-show="!agent.eligible"class="ui red horizontal label">Ineligible</div>
+											</td>
+											<td>{{ agent.expected_available_day | number:2 }}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

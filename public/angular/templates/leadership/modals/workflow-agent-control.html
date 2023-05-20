@@ -1,0 +1,40 @@
+<div id="workflow-agent-control" class="ui modal">
+
+   <!-- Header -->
+   <div class="header">Control Agent</div>
+
+   <!-- Content -->
+   <div class="content">
+
+      <!-- Loader Div -->
+      <div ng-cloak ng-show="saving">
+         <i class="huge loading spinner icon"></i>
+      </div>
+
+      <!-- Form Div -->
+      <div ng-cloak ng-show="!saving">
+         <span ng-if="status === 'available'">
+            <a rel="tooltip" data-original-title="Pause on {{ channel }} channel" ng-click="control(username, asterisk, channel, 'pause');">
+               <i class="massive pause icon"></i>
+            </a>
+         </span>
+
+         <!-- Resume -->
+         <span ng-if="status === 'unavailable'">
+            <a rel="tooltip" data-original-title="Re-join {{ channel }} channel" ng-click="control(username, asterisk, channel, 'unpause');">
+               <i class="massive play icon"></i>
+            </a>
+         </span>
+
+         <!-- Logout -->
+         <span ng-if="status === 'available' || status === 'unavailable'">
+            <a rel="tooltip" data-original-title="Exit {{ channel }} channel" ng-click="control(username, asterisk, channel, 'logout');">
+               <i class="massive sign out icon"></i>
+            </a>
+         </span>
+      </div>
+      <!-- End Form Div-->
+
+   </div>
+   <!-- End Content -->
+</div>

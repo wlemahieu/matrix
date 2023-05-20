@@ -1,0 +1,140 @@
+<?php
+
+/**
+ * Chat Interactions
+ *
+ * Resposibile for recording all of the chats that have occurred between agents and customers.
+ */
+require '../application/model/Chats.php';
+require '../application/model/CustomerComments.php';
+require '../application/model/Logger.php';
+
+$Chats = new Chats($this->db);
+$Cron = new Cron();
+$CustomerComments = new CustomerComments($this->db);
+$Logger = new Logger();
+
+$today = new DateTime('today');
+$tomorrow = new DateTime('tomorrow');
+$start = $today->format('Y-m-d');
+$end = $tomorrow->format('Y-m-d');
+
+$page = 1;
+$base_url = 'https://api.livechatinc.com/chats';
+
+do {
+
+	$string='?date_from='.$start.'&date_to='.$end.'&page='.$page;
+	$url = $base_url . $string;
+
+	$response = $Cron->livechatCurl($url);
+
+	// logging non-200s
+	$Logger->logAPI($response->httpcode);
+
+	// if the api call succeeds,
+	if($response->httpcode === 200) {
+
+		// iterate through all chats (master property)
+		foreach($response->data->chats as $key => $value) {
+
+			// store chat tags
+			if(!empty($value->tags)) {
+				foreach(@$value->tags as $tag) {
+
+					$payload = new stdClass();
+					$payload->chat_id = @$value->id;
+					$payload->tag = $tag;
+
+					$Chats->saveChatTag($payload);
+				}
+			}
+			
+			if(!empty($value->agents)) {
+
+				foreach(@$value->agents as $key) {
+
+					$comment = NULL;
+					$num_rating = NULL;
+
+					/* Did they leave a comment AND a numrating? */
+					if(isset($value->postchat_survey[1]->value)) {
+						$num_rating = $value->postchat_survey[0]->value;
+						$comment = $value->postchat_survey[1]->value;
+					}
+
+					/* Did they leave only a comment or num_rating? */
+					elseif(!isset($value->postchat_survey[1]->value) && isset($value->postchat_survey[0]->value)) {
+
+						/* If it's an integer, it's a number rating. */
+						if(is_int(@$value->postchat_survey[0]) == true) {
+
+							/* Limit the num_rating to 5 since that's our max for sales/cs */
+							$num_rating = $value->postchat_survey[0];
+							if($num_rating > 5) {
+								$num_rating = 5;
+							}
+						}
+						/* It's not an integer, it's a mixture so it's likely just the comment. */
+						else {
+							$comment = $value->postchat_survey[0]->value;
+						}
+					}
+
+					$agentUsername = explode('@',$key->email);
+
+					$payload = new stdClass();
+					$payload->visitor_id = @$value->visitor_id;
+					$payload->chat_id = @$value->id;
+					$payload->contact_id = NULL;
+					$payload->account_id = NULL;
+
+					if(isset($value->custom_variables)) {
+
+						// iterate through all customer variables to get the correct data.
+						// in cases where they add more data, this won't break, unless they stop using key === name of value type
+						foreach($value->custom_variables as $cvKey => $cvObj) {
+							if($cvObj->key === 'Contact') {
+								$payload->contact_id = @$cvObj->value;
+							} else if($cvObj->key === 'Account') {
+								$payload->account_id = @$cvObj->value;
+							}
+						}
+					}
+
+					$payload->group_id = @$value->group[0];
+					$payload->chat_reason = @$value->prechat_survey[1]->value;
+					$payload->rating = @$value->rate;
+					$payload->num_rating = $num_rating;
+					$payload->chat_start = @$value->started_timestamp;
+					$payload->chat_end = @$value->ended_timestamp;
+					$payload->wait_time = @$value->queue->duration;
+					$payload->duration = @$value->duration;
+					$payload->agent_username = @$agentUsername[0];
+
+					$Chats->upsertChat($payload);
+					
+					/* If there is a comment, insert it into the chat_comments table.
+					This is alleviating the load we have when checking for comments using "comment != ''"
+					*/
+					if(trim($comment) != '' && $comment != NULL) {
+
+						$payload = new stdClass();
+						$payload->chat_id = @$value->id;
+						$payload->username = @$agentUsername[0];
+						$payload->comment = $comment;
+
+						$CustomerComments->upsertChatComment($payload);
+					}
+				}
+
+			}
+		}
+		$page++;
+		$lastPage = @$response->data->pages;
+	} else {
+		break;
+	}
+}
+
+while($page <= $lastPage);

@@ -1,0 +1,62 @@
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+#date-inputs {
+  padding-top: 8px !important;
+}
+
+table .ui.input input { 
+  width:100% !important;
+}
+#content {
+	padding-top: 1em;
+}
+.modal.dynamic {
+  min-height: 480px;
+}
+.scrollable-menu {
+	height: auto !important;
+	max-height: 200px !important;
+	overflow-x: hidden !important;
+}
+.scrollable-panel {
+  height: auto !important;
+  max-height: 20em !important;
+  overflow-x: hidden !important;
+}
+.scrollable-panel-double {
+  height: auto !important;
+  max-height: 40em !important;
+  overflow-x: hidden !important;
+}
+#teamFilter {
+	margin: 0em 1em 0em 1em;
+}
+.ui.secondary.pointing.menu .dropdown .active.item {
+  border: none !important;
+}
+
+.tooltipdemoBasicUsage .md-button,
+.tooltipdemoBasicUsage .md-button:hover {
+  box-shadow: none;
+  border: none;
+  transform: none;
+  -webkit-transform: none; 
+}
+.tooltipdemoBasicUsage .left {
+  top: 70px !important;
+  left: 56px !important;
+}
+.tooltipdemoBasicUsage .right {
+  top: 70px !important;
+  right: 56px !important;
+}
+
+.channelControl {
+  padding: 0.3em !important;
+}
+
+.row1 {
+  max-height: 30em;
+  overflow-y: auto;
+}

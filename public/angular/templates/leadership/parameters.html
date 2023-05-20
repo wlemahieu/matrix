@@ -1,0 +1,171 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Parameters</h3>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="sixteen wide column">
+
+			<!-- filter by agent type -->
+			<div class="ui icon top left pointing dropdown button filter">
+				<i class="users icon"></i>
+				<span class="text">{{ filtersVerbose.level }}</span>
+				<div class="menu">
+					<div class="header">
+						<i class="tags icon"></i>
+						Filter by level
+					</div>
+					<div class="item" ng-click="updateFilter('level')">
+						All
+					</div>
+					<div class="item" ng-click="updateFilter('level', 'CS1')">
+						CS1
+					</div>
+					<div class="item" ng-click="updateFilter('level', 'CS2')">
+						CS2
+					</div>
+					<div class="item" ng-click="updateFilter('level', 'CS3')">
+						CS3
+					</div>
+					<div class="item" ng-click="updateFilter('level', 'CS4')">
+						CS4
+					</div>
+				</div>
+			</div>
+
+			<!-- filter by agent status -->
+			<div class="ui icon top left pointing dropdown button filter">
+				<i class="flag icon"></i>
+				<span class="text">{{ filtersVerbose.pt_or_ft }}</span>
+				<div class="menu">
+					<div class="header">
+						<i class="tags icon"></i>
+						Filter by status
+					</div>
+					<div class="item" ng-click="updateFilter('pt_or_ft', 'ft')">
+						Full-time
+					</div>
+					<div class="item" ng-click="updateFilter('pt_or_ft', 'pt')">
+						Part-time
+					</div>
+				</div>
+			</div>
+
+			<!-- filter by assigned channel -->
+			<div class="ui icon top left pointing dropdown button filter">
+				<i class="flag icon"></i>
+				<span class="text">{{ filtersVerbose.channel }}</span>
+				<div class="menu">
+					<div class="header">
+						<i class="tags icon"></i>
+						Filter by assigned channel
+					</div>
+					<div class="item" ng-click="updateFilter('channel', 'calls')">
+						Calls
+					</div>
+					<div class="item" ng-click="updateFilter('channel', 'chats')">
+						Chats
+					</div>
+					<div class="item" ng-click="updateFilter('channel', 'tickets')">
+						Tickets
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end first row -->
+
+	<!-- 2nd row, table data -->
+	<div class="row">
+		<div class="sixteen wide column">
+			<table class="ui basic selectable very compact table">
+				<thead>
+					<tr>
+						<th>Level</th>
+						<th>Status</th>
+						<th>Channel</th>
+						<th>CPD Min.</th>
+						<th>CPD Bonus</th>
+						<th>CSAT Min.</th>
+						<th>CSAT Bonus</th>
+						<th>Avail Min.</th>
+						<th>Avail Bonus</th>
+						<th>PA Min.</th>
+						<th>PA Bonus</th>
+						<th>Attendance Min.</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="parameter in api.parameters | filter:filters ">
+						<td>{{ parameter.level }}</td>
+						<td>{{ parameter.pt_or_ft | uppercase }}</td>
+						<td>{{ parameter.channel | uppercase }}</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.contacts_per_day_min" value="{{ parameter.contacts_per_day_min }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.contacts_per_day_bonus" value="{{ parameter.contacts_per_day_bonus }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.customer_satisfaction_min" value="{{ parameter.customer_satisfaction_min }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.customer_satisfaction_bonus" value="{{ parameter.customer_satisfaction_bonus }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.availability_min" value="{{ parameter.availability_min }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.availability_bonus" value="{{ parameter.availability_bonus }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.program_adherance_min" value="{{ parameter.program_adherance_min }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.program_adherance_bonus" value="{{ parameter.program_adherance_bonus }}"/>
+							</div>
+						</td>
+						<td>
+							<div class="ui input">
+								<input type="text" ng-model="parameter.attendance_min" value="{{ parameter.attendance_min }}"/>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!-- end 2nd row -->
+
+	<!-- 3rd row, data submission -->
+	<div ng-show="userinfo.type === 'Manager'" class="row ng-hide">
+		<div class="sixteen wide column">
+			<button
+			ng-disabled="button.active.disabled || loading"
+			ng-click="submit()"
+			ng-class="button.active.class"
+			class="ui button"
+			type="submit">
+				<i ng-class="button.active.icon" class="icon"></i>
+				{{ button.active.title }}
+			</button>
+		</div>
+	</div>
+</div>

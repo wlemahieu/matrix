@@ -1,0 +1,68 @@
+<!-- ATTENDANCE PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">Attendance <i ng-controller="attendance" ng-click="viewAttendance()" class="eye icon"></i></div>
+
+		<!-- content -->
+		<div class="description">
+
+			<!-- scheduled attendance in pay period -->
+			<a class="ui grey ribbon label">
+				<i class="calender icon"></i> Scheduled Pay Period
+			</a>
+
+			<div
+			class="ui list"
+			ng-show="api.statistics.attendance.scheduled.late.total > 0 || api.statistics.attendance.scheduled.absent.total > 0">
+				<div 
+				ng-repeat="(mark, results) in api.statistics.attendance.scheduled"
+				ng-show="results.dates != ''"
+				class="item">
+					{{ mark }}
+					<div class="ui list" ng-repeat="(key, arr) in results">
+						<div class="item" ng-repeat="(subKey, date) in arr">
+							{{ date }}
+						</div>
+					</div>
+				</div>
+			</div>
+			<br/><br/>
+			<em 
+			ng-hide="api.statistics.attendance.scheduled.late.total > 0 || api.statistics.attendance.scheduled.absent.total > 0">
+				n/a
+			</em>
+			<br/><br/>
+			<!-- end scheduled attendance in pay period -->
+
+			<!-- unscheduled attendance past 30 days -->
+			<a class="ui grey ribbon label">
+				<i class="calender icon"></i> Unscheduled Past 30
+			</a>
+
+			<div
+			class="ui list"
+			ng-show="api.statistics.attendance.unscheduled.late.total > 0 || api.statistics.attendance.unscheduled.absent.total > 0">
+				<div 
+				ng-repeat="(mark, results) in api.statistics.attendance.unscheduled"
+				ng-show="results.dates != ''"
+				class="item">
+					{{ mark }}
+					<div class="ui list" ng-repeat="(key, arr) in results">
+						<div class="item" ng-repeat="(subKey, date) in arr">
+							{{ date }}
+						</div>
+					</div>
+				</div>
+			</div><br/>
+			<em 
+			ng-hide="api.statistics.attendance.unscheduled.late.total > 0 || api.statistics.attendance.unscheduled.absent.total > 0">
+				n/a
+			</em>
+			<!-- end unscheduled attendance past 30 days -->
+		</div>
+		<!-- end description -->
+	</div>
+	<!-- end content -->
+</div>

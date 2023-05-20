@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * Auto Clock-in
+ *
+ * This cron is responsible for automatically clocking-in working agents that are not clocked-in.
+ * 
+ * Last Successful QA: 2015-12-09
+ */
+require '../application/model/AgentNavbar.php';
+require '../application/model/Attendance.php';
+require '../application/model/ClockingControl.php';
+
+$AgentNavbar = new AgentNavbar($this->db);
+$Attendance = new Attendance($this->db);
+$ClockingControl = new ClockingControl($this->db);
+
+// fetch agents scheduled to be working now & place their usernames in an array
+$agentsScheduledNow = array();
+foreach($Attendance->agentsScheduledNow() as $key => $obj) {
+	array_push($agentsScheduledNow, $obj->username);
+}
+
+// loop through all agents
+foreach($AgentNavbar->fetchAgentNavbarData(false) as $obj) {
+
+	// find anyone who is in a live channel AND not clocked in.
+	if(($obj->chats_status != 'offline' || $obj->phones_status != 'offline')) {
+
+		// are they scheduled to work? (check against the array we made earlier) if so, continue
+		if(in_array($obj->username, $agentsScheduledNow)) {
+
+			// are they clocked in already? if so, continue
+			if($ClockingControl->checkClockedIn($obj->username) == 0) {
+
+				// clock them in
+				$ClockingControl->clockIn($obj->username);
+			}
+		}
+	}
+}

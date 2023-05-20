@@ -1,0 +1,19 @@
+<div class="ui grid container-wide">
+	<div class="row" ng-hide="!loaders.initial.workflow">
+		<div class="sixteen wide column">
+			<i class="big blue loading circle notched icon"></i> Loading Workflow...
+		</div>
+	</div>
+	<div class="row">
+		<div class="sixteen wide column">
+			<!-- Content -->
+			<div 
+			ng-class="ng-hide"
+			ng-show="!loaders.initial.workflow">
+				<cs-workflow></cs-workflow>
+				<sales-workflow></sales-workflow>
+				<agent-control-modal></agent-control-modal>
+			</div>
+		</div>
+	</div>
+</div>

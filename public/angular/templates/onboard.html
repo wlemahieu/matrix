@@ -1,0 +1,50 @@
+<p>Hey there! Welcome to <strong>Matrix</strong>. Before we create your user, please tell us about yourself.</p>
+
+<form ng-submit="onboard()">
+
+	<!-- FIRST NAME -->
+	<div class="ui input">
+		<input autocomplete="off" type="text" placeholder="First Name" ng-model="form.first_name" />
+	</div>
+
+	<!-- LAST NAME -->
+	<div class="ui input">
+		<input autocomplete="off" type="text" placeholder="Last Name" ng-model="form.last_name" />
+	</div>
+	<br style="clear:both"/>
+
+	<!-- USER TYPE -->
+	<select id="contact_type" class="ui dropdown" ng-model="form.type">
+		<option value="" disabled selected>User Type</option>
+		<option>Agent</option>
+		<option>Observer</option>
+	</select>
+	<br style="clear:both"/>
+
+	<!-- PART / FULL TIME -->
+	<select id="contact_type" class="ui dropdown" ng-model="form.status">
+		<option value="" disabled selected>Part or Full Time?</option>
+		<option value="ft">Full-Time</option>
+		<option value="pt">Part-Time</option>
+	</select>
+	<br style="clear:both"/>
+
+	<!-- DEPARTMENT -->
+	<select id="contact_type" class="ui dropdown" ng-model="form.dept">
+		<option value="" disabled selected>What department are you in?</option>
+		<option value="CS">Customer Service</option>
+		<option value="CT">Cloudtech</option>
+		<option value="Sales">Sales</option>
+	</select>
+	<br style="clear:both"/><br/>
+
+	<!-- SAVE -->
+	<button
+	ng-disabled="button.state.disabled || loading"
+	ng-class="button.state.class"
+	class="ui button"
+	type="submit">
+		<i ng-class="button.state.icon" class="icon"></i>&nbsp;
+		{{ button.state.title }}
+	</button>
+</form>

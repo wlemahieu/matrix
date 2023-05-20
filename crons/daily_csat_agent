@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Daily CSAT by Agent
+ *
+ * This cron is responsible for updating the information inside of the `csat_daily_per_agent` table.
+ * 
+ */
+
+$Cron = new Cron();
+$Cron->runQuery('CALL matrix.csat_daily_per_agent_etl;');

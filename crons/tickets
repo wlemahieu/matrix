@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * Ticket Responses
+ *
+ * Resposibile for recording all of agent responses to tickets.
+ */
+
+require '../application/model/Semaphore.php';
+require '../application/model/Tickets.php';
+
+$Semaphore = new Semaphore($this->semaphore_db);
+$Tickets = new Tickets($this->db);
+$Cron = new Cron();
+
+foreach($Semaphore->fetchTicketResponses() as $key => $ticket) {
+	
+	$payload = new stdClass();
+	$payload->ticket_id = $ticket->ticket_id;
+	$payload->ticket_history_id = $ticket->ticket_history_id;
+	$payload->hostops_id = $ticket->hostops_id;
+	$payload->agent_responded = $ticket->agent_responded;
+	$payload->type = $ticket->type;
+	$payload->account_id = $ticket->account_id;
+	$payload->user_id = $ticket->user_id;
+	$payload->service_id = $ticket->service_id;
+	$payload->incident = $ticket->incident;
+
+	$Tickets->upsertTicket($payload);
+}

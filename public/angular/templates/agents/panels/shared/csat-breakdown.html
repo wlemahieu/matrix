@@ -1,0 +1,63 @@
+<!-- CSAT BREAKDOWN PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">CSAT</div>
+
+		<!-- content -->
+		<div class="description">
+
+			<!-- pay period label -->
+			<a class="ui grey ribbon label">
+				<i class="calender icon"></i> Pay Period
+			</a>
+
+			<!-- pay period -->
+			<div class="ui list" ng-show="api.statistics.period.csat_overall !== null">
+				<div ng-if="api.statistics.period.csat_chats" class="item">{{ api.statistics.period.csat_chats | number:2 }}% Chats</div>
+				<div ng-if="api.statistics.period.csat_calls" class="item">{{ api.statistics.period.csat_calls | number:2 }}% Calls</div>
+				<div ng-if="api.statistics.period.csat_tickets" class="item">{{ api.statistics.period.csat_tickets | number:2 }}% Tickets</div>
+				<div ng-class="csatPeriodStatus" class="ui progress" id="csat_overall">
+					<div class="bar">
+						<div class="progress"></div>
+					</div>
+					<div class="label">Overall</div>
+				</div>
+			</div>
+			<br/>
+			
+			<div class="ng-hide" ng-show="api.statistics.period.csat_overall === null">
+				<br/>
+				<em>No responses</em>
+				<br/><br/>
+			</div>
+
+			<!-- today label -->
+			<a class="ui blue ribbon label">
+				<i class="calender icon"></i> Today
+			</a>
+
+			<!-- today -->
+			<div class="ui list" ng-show="api.statistics.today.csat_overall !== null">
+				<div ng-if="api.statistics.today.csat_chats" class="item">{{ api.statistics.today.csat_chats | number:2 }}% Chats</div>
+				<div ng-if="api.statistics.today.csat_calls" class="item">{{ api.statistics.today.csat_calls | number:2 }}% Calls</div>
+				<div ng-if="api.statistics.today.csat_tickets" class="item">{{ api.statistics.today.csat_tickets | number:2 }}% Tickets</div>
+				<div ng-class="csatTodayStatus" class="ui progress" id="csat_today">
+					<div class="bar">
+						<div class="progress"></div>
+					</div>
+					<div class="label">Overall</div>
+				</div>
+			</div>
+			<br/>
+			
+			<div class="ng-hide" ng-show="api.statistics.today.csat_overall === null">
+				<br/>
+				<em>No responses</em>
+				<br/><br/>
+			</div>
+
+		</div>
+	</div>
+</div>

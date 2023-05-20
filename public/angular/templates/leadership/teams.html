@@ -1,0 +1,81 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Manage Teams</h3>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="three wide column">
+			<team-selector></team-selector>
+		</div>
+		<div class="two wide column">
+			<div ng-click="newTeam()" class="ui green button">
+				New
+			</div>
+		</div>
+	</div>
+
+	<br style="clear:both;"><br/>
+
+	<!-- Content -->
+	<div ng-cloak ng-show="selectedTeamObj !== undefined">
+
+		<!-- start form -->
+		<form ng-submit="submit()">
+
+			<div class="row">
+				<div class="sixteen wide column">
+
+					<div class="ui labeled input">
+						<div class="ui label">
+							Team Name
+						</div>
+						<input ng-model="selectedTeamObj.name"/>
+					</div>
+
+					<div class="ui labeled input">
+						<div class="ui label">
+							Status
+						</div>
+						<select ng-model="selectedTeamObj.active" class="ui dropdown">
+							<option value="1" ng-selected="selectedTeamObj.active == '1'">
+								Active
+							</option>
+							<option value="0" ng-selected="selectedTeamObj.active == '0'">
+								Inactive
+							</option>
+						</select>
+					</div>
+
+					<div class="ui labeled input">
+						<div class="ui label">
+							Shift Type
+						</div>
+						<select ng-model="selectedTeamObj.sunrise" class="ui dropdown">
+							<option value="0" ng-selected="selectedTeamObj.sunrise == '0'">
+								Normal
+							</option>
+							<option value="1" ng-selected="selectedTeamObj.sunrise == '1'">
+								Sunrise
+							</option>
+						</select>
+					</div>
+
+					<button
+					ng-disabled="button.active.disabled == true || loading == 1"
+					ng-click="submit()"
+					ng-class="button.active.class"
+					class="ui button"
+					type="submit">
+						<i ng-class="button.active.icon" class="icon"></i>&nbsp;
+						{{ button.active.title }}
+					</button>
+				</div>
+			</div>
+			<!-- end form submit -->
+		</form>
+		<!-- end form -->
+	</div>
+	<!-- end content -->
+</div>

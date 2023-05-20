@@ -1,0 +1,173 @@
+<!-- manipulate new or existing checkin -->
+<div ng-show="tab === 'new' || tab === 'edit'" class="ui grid ng-hide">
+
+   <!-- Left Column -->
+   <div class="four wide column">
+      <div class="ui list">
+
+         <!-- Interaction Date -->
+         <a class="item">
+            <i class="user icon"></i>
+            <div class="content">
+               <div class="header">Interaction Date</div>
+               <md-datepicker ng-model="form.interaction_date" md-placeholder="MM/DD/YYYY"></md-datepicker>
+            </div>
+         </a>
+
+         <!-- Agent Username -->
+         <a class="item">
+            <i class="user icon"></i>
+            <div class="content">
+               <div class="header">Agent Username</div>
+               <agent-selector ng-show="!form.id" class="ng-hide"></agent-selector>
+               <span ng-show="form.id" class="ng-hide ui big label">{{ form.agent_username }}</span>
+            </div>
+         </a>
+
+
+         <!-- Account Number -->
+         <a class="item">
+            <i class="folder icon"></i>
+            <div class="content">
+               <div class="header">Account Number</div>
+               <div class="ui input description">
+                  <input ng-model="form.account_number" type="text">
+               </div>
+            </div>
+         </a>
+
+         <!-- Contact Type -->
+         <a class="item">
+            <i class="text telephone icon"></i>
+            <div class="content">
+               <div class="header">Contact Type</div>
+               <div class="description">
+                  <select id="contact_type" class="ui dropdown" ng-model="form.contact_type">
+                     <option>Call</option>
+                     <option>Chat</option>
+                     <option>Ticket</option>
+                  </select>
+               </div>
+            </div>
+         </a>
+
+         <!-- Support Number -->
+         <a class="item">
+            <i class="comment icon"></i>
+            <div class="content">
+               <div class="header">Support Number</div>
+               <div class="ui input description">
+                  <input ng-model="form.support_number" type="text">
+               </div>
+            </div>
+         </a>
+
+      </div>
+   </div>
+
+   <!-- Middle Column -->
+   <div class="six wide column">
+
+      <div class="ui list">
+
+         <a class="item" ng-repeat="item in qaProperties1">
+
+            <i ng-class="item.icon" class="icon"></i>
+
+            <div class="content">
+
+               <!-- Question -->
+               <div class="header">{{ item.question }}</div>
+
+               <!-- Yes or No Answer buttons -->
+               <div class="description">
+                  <div class="ui icon buttons">
+
+                     <!-- True answer -->
+                     <button 
+                     ng-class="{ 'active' : item.answer === 1, '{{ item.yesColor }}' : item.answer === 1 }" 
+                     ng-click="item.answer = 1;" 
+                     class="ui button">
+                        <i class="thumbs up icon"></i>
+                     </button>
+
+                     <!-- False answer -->
+                     <button 
+                     ng-class="{ 'active' : item.answer === 0, '{{ item.noColor }}' : item.answer === 0 }" 
+                     ng-click="item.answer = 0;" 
+                     class="ui button">
+                        <i class="thumbs down icon"></i>
+                     </button>
+                  </div>
+               </div>
+            </div>
+         </a>
+      </div>
+   </div>
+
+   <!-- Right Column -->
+   <div class="six wide column">
+
+      <div class="ui list">
+
+         <a class="item" ng-repeat="item in qaProperties2">
+
+            <i ng-class="item.icon" class="icon"></i>
+
+            <div class="content">
+
+               <!-- Question -->
+               <div class="header">{{ item.question }}</div>
+
+               <!-- Yes or No Answer buttons -->
+               <div class="description">
+                  <div class="ui icon buttons">
+
+                     <!-- True answer -->
+                     <button 
+                     ng-class="{ 'active' : item.answer === 1, '{{ item.yesColor }}' : item.answer === 1 }" 
+                     ng-click="item.answer = 1;" 
+                     class="ui button">
+                        <i class="thumbs up icon"></i>
+                     </button>
+
+                     <!-- False answer -->
+                     <button 
+                     ng-class="{ 'active' : item.answer === 0, '{{ item.noColor }}' : item.answer === 0 }" 
+                     ng-click="item.answer = 0;" 
+                     class="ui button">
+                        <i class="thumbs down icon"></i>
+                     </button>
+                  </div>
+               </div>
+            </div>
+         </a>
+      </div>
+   </div>
+
+   <!-- Additional Comments -->
+   <div class="ten wide column centered">
+      <div class="ui raised segment">
+         <a class="ui orange ribbon label">Additional Comments</a>
+         <br style="clear:both;"/><br/>
+         <div class="ui form">
+            <div class="field">
+               <textarea ng-model="form.comment" rows="2"></textarea>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <!-- Save Checkin -->
+   <div class="sixteen wide column">
+      <button
+      ng-disabled="button.state.disabled"
+      ng-click="submit()"
+      ng-class="button.state.class"
+      class="ui button"
+      type="submit">
+         <i ng-class="button.state.icon" class="icon"></i>&nbsp;
+         {{ button.state.title }}
+      </button>
+   </div>
+</div>

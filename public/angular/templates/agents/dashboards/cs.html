@@ -1,0 +1,61 @@
+<div class="ui grid container">
+	
+	<!-- 1st ROW FOR EMULATORS -->
+ 	<div class="sixteen wide column ng-hide" ng-show="userinfo.emulating">
+		Agent Dashboard for: <strong>{{ userinfo.username | uppercase }}</strong>
+	</div>
+
+	<!-- 1ST ROW -->
+ 	<div class="sixteen wide column ng-hide" ng-show="api.callerInfo.active">
+ 		<caller-info></caller-info>
+ 	</div>
+
+	<!-- 2ND ROW -->
+ 	<div class="three wide column row1">
+ 		<csat-breakdown></csat-breakdown>
+ 	</div>
+ 	<div class="three wide column row1">
+ 		<availability></availability>
+ 	</div>
+ 	<div class="four wide column row1">
+ 		<customer-comments></customer-comments>
+ 	</div>
+ 	<div class="three wide column row1">
+ 		<attendance></attendance>
+ 	</div>
+ 	<div class="three wide column row1">
+ 		<contacts></contacts>
+ 	</div>
+
+	<!-- 3RD ROW -->
+ 	<div class="ten wide column">
+ 		<agent-checkins></agent-checkins>
+ 	</div>
+ 	<div class="six wide column">
+ 		<one-on-ones></one-on-ones>
+ 	</div>
+
+	<!-- 4TH ROW -->
+ 	<div class="four wide column">
+ 		<sales-goals></sales-goals>
+ 	</div>
+ 	<div class="four wide column">
+ 		<cs-contribution></cs-contribution>
+ 	</div>
+ 	<div class="four wide column">
+ 		<cs-payouts></cs-payouts>
+ 	</div>
+ 	<div class="four wide column">
+ 		<cs-eligibility></cs-eligibility>
+ 	</div>
+
+	<!-- 5TH ROW -->
+ 	<div class="sixteen wide column">
+		<line-item-sales></line-item-sales>
+	</div>
+</div>
+
+<exit-confirmation-modal></exit-confirmation-modal>
+<view-checkin-modal></view-checkin-modal>
+<view-oneonone-modal></view-oneonone-modal>
+<attendance-modal></attendance-modal>

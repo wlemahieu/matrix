@@ -1,0 +1,106 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>User Schedules</h3>
+		</div>
+	</div>
+	
+	<!-- agent selector -->
+	<div class="row">
+		<div class="sixteen wide column">
+			<agent-selector></agent-selector>
+		</div>
+	</div>
+
+	<!-- content loader -->
+	<div ng-cloak ng-show="loaders.inline.userSchedule || loaders.initial.userSchedule" class="row">
+		<div class="sixteen wide column">
+			<i class="loading spinner icon"></i>&nbsp; Loading schedule for <strong>{{ selectedAgent }}</strong> ...
+		</div>
+	</div>
+
+	<div class="row" ng-cloak ng-show="selectedAgent && selectedAgent != 'Select a user' && !loaders.inline.userSchedule && !loaders.initial.userSchedule">
+
+		<!-- content -->
+		<div class="sixteen wide column">
+
+			<form ng-submit="save()">
+
+				<table class="ui basic selectable very compact table">
+					<thead>
+						<tr>
+							<th>Day</th>
+							<th>Start Time</th>
+							<th>Lunch Start</th>
+							<th>Lunch End</th>
+							<th>Break 1</th>
+							<th>Break 2</th>
+							<th>Team Meeting</th>
+							<th>One on One</th>
+							<th>Self-Directed</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="schedule in api.userSchedule">
+							<td>
+								{{ schedule.day }}
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.start_time" ng-value="schedule.start_time" />
+								</div>
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.lunch_start" ng-value="schedule.lunch_start" />
+								</div>
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.lunch_end" ng-value="schedule.lunch_end" />
+								</div>
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.break1" ng-value="schedule.break1" />
+								</div>
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.break2" ng-value="schedule.break2" />
+								</div>
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.team_meeting" ng-value="schedule.team_meeting" />
+								</div>
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.one_on_one" ng-value="schedule.one_on_one" />
+								</div>
+							</td>
+							<td>
+								<div class="ui input">
+									<input ng-model="schedule.self_directed_time" ng-value="schedule.self_directed_time" />
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<button
+				ng-disabled="button.active.disabled || loading"
+				ng-click="submit()"
+				ng-class="button.active.class"
+				class="ui huge button"
+				type="submit">
+					<i ng-class="button.active.icon" class="icon"></i>&nbsp;
+					{{ button.active.title }}
+				</button>
+			</form>
+		</div>
+		<!-- end content -->
+	</div>
+	<!-- end grid -->
+</div>

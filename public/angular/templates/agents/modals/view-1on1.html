@@ -1,0 +1,80 @@
+<div id="view-1on1" class="ui modal dynamic">
+	<i class="close icon"></i>
+	<div class="header">
+		1on1
+	</div>
+	<div class="content">
+
+		<!-- QUESTIONS -->
+		<ul class="ui list">
+			<div class="item">
+				<strong>Lead:</strong>&nbsp;{{ oneonone.leadership_username }}
+			</div>
+			<div class="item">
+				<strong>Agent:</strong>&nbsp;{{ oneonone.agent_username }}
+			</div>
+			<div class="item">
+				<strong>Created:</strong>&nbsp;{{ oneonone.created | date: 'shortDate' }}
+			</div>
+			<div class="item">
+				<strong>Finished:</strong>&nbsp;{{ oneonone.finished | date: 'shortDate' }}
+			</div>
+			<div class="item">
+				<strong>Accepted:</strong>&nbsp;{{ oneonone.accepted | date: 'shortDate' }}
+			</div>
+		</ul>
+
+		<br style="clear:both;"/>
+
+		<!-- ANSWERS -->
+		<div class="ui divided list">
+			<div class="item" ng-repeat="(key, obj) in oneonone.answers">
+				<div class="header">{{ obj.question }}</div>
+				<div class="description">
+					{{ obj.answer }}
+				</div>
+			</div>
+		</div>
+
+		<!-- Employee NPS -->
+		<div ng-show="oneonone.enps_able && !oneonone.accepted && oneonone.accepted !== 0 && !userinfo.emulating" class="ng-hide">
+			<br style="clear:both;"/>
+			<span>The ENPS answers you provide below are 100% agent-anonymous.</span>
+			<div class="ui icon message">
+				<i class="help circle icon"></i>
+				<div class="content">
+					<div class="header">
+						How likely are you to recommend working at Media Temple to a friend or colleague?
+					</div>
+					<p>
+						<div class="ui star rating" id="enps_rating"></div>
+					</p>
+					<div class="header">
+						What is the primary reason for the answer you just gave?
+					</div>
+					<p>
+						<div class="ui form">
+							<div class="field">
+								<textarea rows="2" ng-model="oneonone.reason"></textarea>
+							</div>
+						</div>
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- ACCEPTANCE -->
+		<div ng-show="!oneonone.accepted && oneonone.accepted !== 0 && !userinfo.emulating" class="ng-hide">
+			<br style="clear:both;"/><br/><br/>
+			<button
+			class="ui button"
+			ng-disabled="button.accept.state.disabled || saving"
+			ng-click="acceptOneOnOne()"
+			ng-class="button.accept.state.class"
+			type="submit">
+			<i ng-class="button.accept.state.icon" class="icon"></i>&nbsp;
+			{{ button.accept.state.title }}
+		</button>
+	</div>
+</div>
+</div>

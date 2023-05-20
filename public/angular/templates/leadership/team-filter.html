@@ -1,0 +1,17 @@
+<!-- team filter dropdown -->
+<div id="teamFilter" class="ui simple dropdown item">
+    <i class="large group icon"></i>&nbsp;{{ selectedTeam }}
+    <div class="menu">
+        <a ng-click="filterTeam(team.name)" ng-repeat="team in api.teams" class="item">
+            {{ team.name }}
+        </a>
+    </div>
+</div>
+
+<!-- cancel team filter button -->
+<button
+ng-show="selectedTeam !== 'Filter by team'" 
+class="mini ui button ng-hide"
+ng-click="filterTeam('Filter by team')">
+    <i class="close icon"></i>
+</button>

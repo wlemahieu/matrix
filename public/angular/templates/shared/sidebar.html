@@ -1,0 +1,36 @@
+<!-- Sidebar Menu -->
+<div class="ui vertical inverted sidebar menu">
+
+    <a href="/#/" class="item header">Matrix</a>
+    
+    <!-- Company Resources -->
+    <div class="ui simple dropdown item">
+        Resources
+        <div class="menu">
+            <a class="item" href="http://academy.mediatemple.net/" target="_blank">Academy</a>
+            <a class="item" href="https://astronomer.mtvoip.net/" target="_blank">Astronomer</a>
+            <a class="item" href="https://tools.mtsvc.net/confluence/" target="_blank">Confluence</a>
+            <a class="item" href="https://hostops.mediatemple.net/" target="_blank">HostOps</a>
+            <a class="item" href="http://hq.mediatemple.net/" target="_blank">HQ Blog</a>
+            <a class="item" href="https://tools.mtsvc.net/jira/" target="_blank">JIRA</a>
+            <a class="item" href="http://old.matrix.mediatemple.net/sales-pulse.php" target="_blank">Sales Pulse</a>
+            <a class="item" href="http://old.matrix.mediatemple.net/support-pulse.php" target="_blank">Support Pulse</a>
+            <a class="item" href="http://old.matrix.mediatemple.net/tsc" target="_blank">Troubleshooting Center</a>
+        </div>
+    </div>
+
+    <!-- Login -->
+    <a ng-cloak ng-show="userinfo === undefined && !loading" class="item" ng-click="login()">
+        Enter
+    </a>
+
+    <!-- Logout (non-agents) -->
+    <a ng-cloak ng-show="userinfo.type != 'Agent' && userinfo !== undefined && !loading" class="item" ng-click="logout()">
+        Exit
+    </a>
+
+    <!-- Logout (agents)-->
+    <a ng-cloak ng-show="userinfo.type == 'Agent' && !loading" class="item" ng-click="toggleExitConfirmModal(true)">
+        Exit
+    </a>
+</div>

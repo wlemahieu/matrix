@@ -1,0 +1,36 @@
+<!-- All Conversocial Users Modal -->
+<div id="conversocial-users" class="ui modal">
+
+	<!-- Header -->
+	<div class="header"><i class="users icon"></i> Conversocial Users</div>
+
+	<!-- Content -->
+	<div class="content">
+		<table class="ui celled striped table">
+			<thead>
+				<tr>
+					<th>
+						Name
+					</th>
+					<th>
+						ID
+					</th>
+					<th>
+						Status
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="obj in api.conversocialUsers track by $index">
+					<td class="collapsing">
+						{{ obj.first_name }} {{ obj.last_name }}
+					</td>
+					<td>{{ obj.cs_id }}</td>
+					<td ng-class="{'positive': obj.is_active, 'negative': !obj.is_active }">
+						{{ obj.is_active }}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,58 @@
+<!-- filters -->
+<div class="btn-group">
+	<label class="btn btn-default" ng-model="filter.nps_type" btn-radio="'Detractor'">Detractors</label>
+	<label class="btn btn-default" ng-model="filter.nps_type" btn-radio="'Passive'">Passives</label>
+	<label class="btn btn-default" ng-model="filter.nps_type" btn-radio="'Promoter'">Promoters</label>
+</div>
+
+<!-- survey line items -->
+<table class="table condensed hover">
+	<thead>
+		<tr>
+			<th>Datetime</th>
+			<th>Account</th>
+			<th>Agent</th>
+			<th>Accuracy</th>
+			<th>Friendliness</th>
+			<th>Resolution</th>
+			<th>Satisfaction</th>
+			<th>Type</th>
+			<th>Comment</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="arr in api.afterCallSurveys | limitTo:limit | filter:filter">
+			<td>
+				{{ arr.datetime }}
+			</td>
+			<td>
+				<a href="https://hostops.mediatemple.net/index.php?url=https%3A//hostops.mediatemple.net/account/%3Fview%3Daccount%26id%3D{{ arr.account }}" target="_blank">
+					{{ arr.account }}
+				</a>
+			</td>
+			<td>
+				{{ arr.agent }}
+			</td>
+			<td>
+				{{ arr.accuracy }}
+			</td>
+			<td>
+				{{ arr.friendliness }}
+			</td>
+			<td>
+				{{ arr.resolution }}
+			</td>
+			<td>
+				{{ arr.satisfaction }}
+			</td>
+			<td>
+				{{ arr.nps_type }}
+			</td>
+			<td>
+				<button ng-if="arr.comment" popover-placement="top" popover="{{ arr.comment }}" class="btn btn-default">
+					<i class="fa fa-comment"></i>
+				</button>
+			</td>
+		</tr>
+	</tbody>
+</table>

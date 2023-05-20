@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * Absences Marker Cron
+ *
+ * Resposibile for marking agents absent every hour for the past hour.
+ */
+
+require '../application/model/Attendance.php';
+require '../application/model/ClockingControl.php';
+
+$Attendance = new Attendance($this->db);
+$ClockingControl = new ClockingControl($this->db);
+
+$absences = $Attendance->checkForAbsences();
+
+foreach($absences as $key => $object) {
+
+	$timestamps = $ClockingControl->agentScheduleStartEnd($object->username, date('m/d/Y'));
+
+	$started = $timestamps->start_time;
+	$ended = $timestamps->end_time;
+
+	$ClockingControl->addAttendanceMark('Auto', $object->username, 'Absence', 0, $started, $ended);
+}

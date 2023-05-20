@@ -1,0 +1,57 @@
+<?php
+
+/*
+This script runs every 1 minute via cron.
+Within each 1 minute timeframe, this script loops over as many times as it can and ends after 1 minute.
+This model could be adopted for all crons running.
+*/
+
+require '../application/model/AgentNavbar.php';
+require '../application/model/ChannelControl.php';
+require '../application/model/Parameters.php';
+
+$AgentNavbar = new AgentNavbar($this->db);
+$Parameters = new Parameters($this->db);
+$ChannelControl = new ChannelControl($this->db);
+
+$start = strtotime('now');
+$now = $start;
+$diff = 0;
+
+// if we are within the 1 minute of this cron running, loop over again.
+while($diff < 60) {
+
+	/**
+	 * Prevents CS agents from being in both the phone and chat channel at the same time.
+	 * Logged-out users are logged in dual_channel_restriction.log
+	 */
+
+	// loop through all agents
+	foreach($AgentNavbar->fetchAgentNavbarData(false) as $obj) {
+
+		// only target CS department
+		if($obj->dept == 'CS') {
+
+			// if they are in both channels
+			if($obj->chats_status != 'offline' && $obj->phones_status != 'offline') {
+
+				// grab their default channel
+				$defaultChannel = $Parameters->getAgentChannel($obj->username);
+
+				// then remove them from their non-default channel
+				if($defaultChannel == 'calls') {
+					$ChannelControl->chatActionController($obj->username, 'logout');
+				}
+				elseif($defaultChannel == 'chats') {
+					$ChannelControl->phoneActionController($obj->asterisk_id, 'logout');
+				}
+			}
+		}
+	}
+
+	// find the difference in time between now and the very first time this script was run
+	$diff = strtotime('now') - $start;
+	
+	// since this script runs nearly instantly, let's put it to sleep for 10 seconds after each run. About 6 times per minute is enough.
+	sleep(10);
+}

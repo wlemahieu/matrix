@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * Phone Interactions
+ *
+ * Resposibile for recording all of the calls that have occurred between agents and customers.
+ */
+require '../application/model/Calls.php';
+require '../application/model/Logger.php';
+
+$Calls = new Calls($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$response = $Cron->astronomerCurl('https://astronomer.mtvoip.net/api/historic/queue_events');
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+if($response->httpcode === 200) {
+	foreach($response->data as $key => $object) {
+
+		$payload = new stdClass();
+		$payload->call_id = @$object->call_id;
+		$payload->asterisk_id = @$object->agent_device;
+		$payload->queue_number = @$object->queue;
+		$payload->started = @$object->timestamp - @$object->call_time;
+		$payload->ended = @$object->timestamp;
+		$payload->hold_time = @$object->hold_time;
+		$payload->handle_time = @$object->call_time;
+
+		$Calls->upsertPhoneCall($payload);
+	}
+}

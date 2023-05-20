@@ -1,0 +1,120 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Employee NPS</h3>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="sixteen wide column">
+
+			<div class="ui grid">
+
+				<div ng-show="loading" class="ui active inverted dimmer ng-hide">
+					<div class="ui large text loader">Loading</div>
+				</div>
+
+				<div ng-show="!loading" class="sixteen wide column ng-hide">
+					<div class="ui statistics">
+						<div class="statistic">
+							<div class="value">
+								{{ enps.score | number:2 }}
+							</div>
+							<div class="label">
+								ENPS Score
+							</div>
+						</div>
+						<div class="statistic">
+							<div class="value">
+								{{ enps.avgRating }}
+							</div>
+							<div class="label">
+								Average Rating
+							</div>
+						</div>
+						<div class="statistic">
+							<div class="value">
+								<i class="comments icon"></i> {{ enps.count }}
+							</div>
+							<div class="label">
+								Total Responses
+							</div>
+						</div>
+						<div class="red statistic">
+							<div class="value">
+								<i class="frown icon"></i> {{ enps.nps.detractors }}
+							</div>
+							<div class="red label">
+								Detractors
+							</div>
+						</div>
+						<div class="grey statistic">
+							<div class="value">
+								<i class="meh down icon"></i> {{ enps.nps.passives }}
+							</div>
+							<div class="grey label">
+								Passives
+							</div>
+						</div>
+						<div class="green statistic">
+							<div class="value">
+								<i class="smile icon"></i> {{ enps.nps.promoters }}
+							</div>
+							<div class="green label">
+								Promoters
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- NPS Filters -->
+				<div class="four wide column">
+					<div class="ui mini buttons">
+						<button
+						ng-repeat="option in filterOptions"
+						ng-class="{ 'blue': filter.nps_type === option || ( option === 'All' && !filter.nps_type ) }" 
+						class="ui button" 
+						ng-click="setLineItemsFilter('nps_type', option)">{{ option }}</button>
+					</div>
+				</div>
+
+				<!-- Team Filter -->
+				<div class="twelve wide column">
+					<team-filter></team-filter>
+				</div>
+
+				<div class="sixteen wide column">
+					<table class="ui striped single line table">
+						<thead>
+							<tr>
+								<th>Submitted</th>
+								<th>Team</th>
+								<th>Lead</th>
+								<th>Rating</th>
+								<th>Type</th>
+								<th>Reason</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr 
+							ng-class="{ 'negative': response.nps_type === 'Detractor', 'positive': response.nps_type === 'Promoter' }"
+							ng-repeat="response in enps.surveys | filter: filter track by $index">
+								<td>{{ response.submitted_date | date: 'shortDate' }}</td>
+								<td>{{ response.team }}</td>
+								<td>{{ response.leadership_username }}</td>
+								<td>{{ response.rating }}</td>
+								<td>
+									<div class="ui label">
+										{{ response.nps_type }}
+									</div>
+								</td>
+								<td><i ng-click="open(response.id)"class="eye icon"></i></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<enps-reason-modal></enps-reason-modal>
+		</div>
+	</div>
+</div>

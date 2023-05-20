@@ -1,0 +1,228 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>1on1s</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="sixteen wide column">
+			<!-- Loader -->
+			<div class="ng-hide" ng-show="loaders.initial.oneonones">
+				<i class="big blue loading circle notched icon"></i> Loading 1on1s...
+			</div>
+
+			<!-- Content -->
+			<div class="ng-hide" ng-show="!loaders.initial.oneonones">
+				
+				<div class="ui grid container">
+					<div class="row">
+						<div class="sixteen wide column">
+
+							<!-- Q&A Toggle -->
+							<div class="ui compact menu">
+								<a class="item" ng-click="toggleTab('Questions');" ng-class="{ 'active': tab == 'Questions' }">
+									<i class="help icon"></i>Questions
+								</a>
+								<a class="item" ng-click="toggleTab('Reviews');" ng-class="{ 'active': tab == 'Reviews' }">
+									<i class="star half empty icon"></i>1on1s
+								</a>
+							</div>
+							
+							<!-- Tabs -->
+							<!-- Reviews Tab -->
+							<div ng-controller="reviewsCtrl" class="ng-hide" ng-show="tab === 'Reviews'">
+
+								<!-- Reviews & Answers -->
+								<div class="ng-hide" ng-show="activeQuestionsCount > 0">
+
+									<br style="clear:both;"/>
+
+									<agent-selector></agent-selector>
+
+									<br style="clear:both;"/><br/>
+
+									<!-- Existing Reviews -->
+									<div ng-show="!agentSelectLoading" class="ui icon buttons small ng-hide">
+										<button 
+										ng-repeat="obj in agentOneOnOnes track by $index"
+										ng-click="open(obj.id)"
+										ng-class="{ 'grey': !obj.finished && obj.active, 'blue': obj.finished && obj.active, 'green': obj.accepted, 'grey': !obj.active }"
+										ng-disabled="!obj.active"
+										class="ui button">
+											<span class="ng-hide" ng-show="!obj.finished">
+												{{ obj.created | date: 'shortDate' }}
+											</span>
+											<span class="ng-hide" ng-show="obj.finished">
+												{{ obj.created | date: 'shortDate' }}
+											</span>
+										</button>
+									</div>
+
+									<!-- New Review -->
+									<button 
+									ng-show="!agentSelectLoading && !todayComplete && selectedAgent && selectedAgent != 'Select a user'" 
+									ng-click="new()"
+									class="ui button small ng-hide">
+										<i class="pencil icon"></i> New
+									</button>
+
+									<!-- Question & Answer Textareas (once they activate a specific review) -->
+									<div ng-show="selectedAgent && selectedAgent!='Select a user' && active.answers.length > 0 && !agentSelectLoading" class="ui raised segment ng-hide">
+
+										<!-- Creation date ribbon -->
+										<a ng-show="active.created" class="ui black ribbon label ng-hide">Created</a>
+										<span ng-show="active.created" class="ng-hide">{{ active.created | date: 'shortDate' }}</span>
+
+										<!-- Presented date ribbon -->
+										<a ng-show="active.finished" class="ui blue label ng-hide">Presented</a>
+										<span ng-show="active.finished" class="ng-hide">{{ active.finished | date: 'shortDate' }}</span>
+
+										<!-- Accepted date ribbon -->
+										<a ng-show="active.accepted" class="ui green label ng-hide">Accepted</a>
+										<span ng-show="active.accepted" class="ng-hide">{{ active.accepted | date: 'shortDate' }}</span>
+
+										<!-- questions and answers list -->
+										<div class="ui list">
+											<div ng-repeat="obj in active.answers | orderBy: 'position'" class="item">
+												<div class="ui form">
+													<div class="field">
+														<label>{{ obj.question }}</label>
+														<textarea ng-mouseleave="updateActiveAnsweredCount()" ng-disabled="active.finished" ng-model="obj.answer" rows="2"></textarea>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="ng-hide" ng-show="selectedAgent !== 'Select a user' && !active.empty && !active.finished">
+
+										<!-- BUTTONS -->
+										<!-- Save -->
+										<button
+										class="ui button ng-hide"
+										ng-show="!active.empty && !active.finished"
+										ng-disabled="button.save.state.disabled || loading"
+										ng-click="save()"
+										ng-class="button.save.state.class"
+										type="submit">
+											<i ng-class="button.save.state.icon" class="icon"></i>&nbsp;
+											{{ button.save.state.title }}
+										</button>
+
+										<!-- Finish -->
+										<button
+										class="ui button ng-hide"
+										ng-show="answersComplete && !active.empty && !active.finished"
+										ng-disabled="button.present.state.disabled || loading"
+										ng-click="present()"
+										ng-class="button.present.state.class"
+										type="submit">
+											<i ng-class="button.present.state.icon" class="icon"></i>&nbsp;
+											{{ button.present.state.title }}
+										</button>
+
+										<!-- Remove -->
+										<button
+										class="ui button ng-hide"
+										ng-show="active.id && !active.empty && !active.finished"
+										ng-disabled="button.remove.state.disabled || loading"
+										ng-click="remove()"
+										ng-class="button.remove.state.class"
+										type="submit">
+											<i ng-class="button.remove.state.icon" class="icon"></i>&nbsp;
+											{{ button.remove.state.title }}
+										</button>
+										<br style="clear:both;"/><br/>
+									</div>
+								</div>
+
+								<!-- no questions created yet alert -->
+								<div ng-show="activeQuestionsCount < 1" class="ng-hide ui secondary inverted red segment">
+							  		<p>There are <strong>no questions</strong> created yet.</p>
+							  	</div>
+							</div>
+							<!-- end content -->
+
+
+							<!-- Questions Tab -->
+							<div ng-controller="questionsCtrl" class="ng-hide" ng-show="tab === 'Questions'">
+
+								<br style="clear:both;"/>
+
+								<!-- New Question / Close Form button switch -->
+								<a ng-click="formToggle()" ng-class="form.color" class="ui tiny button">
+									<i ng-class="form.icon" class="icon"></i>{{ form.title }}
+								</a>
+
+								<!-- Only allow filters if we have questions -->
+								<div class="ui tiny buttons">
+								    <a class="ui grey button" ng-class="{ 'active': status == 'Active' }" ng-click="status = 'Active'">
+								    	Active
+								    </a>
+								    <a class="ui grey button" ng-class="{ 'active': status == 'Inactive' }" ng-click="status = 'Inactive';">
+								    	Inactive
+								    </a>
+								</div>
+
+								<!-- Questions -->
+								<table class="ui very compact basic table">
+									<thead>
+										<tr>
+											<th>Position</th>
+											<th>Question</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<!-- Questions list -->
+										<tr 
+										ng-show="( status === 'Active' && obj.active == 1 ) || ( status === 'Inactive' && obj.active == 0 )" 
+										ng-repeat="obj in questions | orderBy: 'position' track by $index"
+										class="ng-hide">
+											<td>
+												{{ obj.position }}
+											</td>
+											<td>
+												{{ obj.question }}
+											</td>
+											<td>
+												<a ng-click="toggleQuestion('activate', obj.question_id)" ng-show="obj.active === 0" class="ng-hide">
+													<i class="plus icon"></i>
+												</a>
+												<a ng-click="toggleQuestion('deactivate', obj.question_id)" ng-show="obj.active === 1" class="ng-hide">
+													<i class="minus icon"></i>
+												</a>
+											</td>
+										</tr>
+
+										<!-- New question row -->
+										<tr ng-show="form.show && status != 'Inactive'" class="ng-hide">
+											<!-- Position -->
+											<td><div class="ui input"><input type="number" ng-model="question.position" max-length="2" min="1" /></div></td>
+											<!-- Question -->
+											<td><div class="ui input"><input type="text" ng-model="question.question" /></div></td>
+											<!-- Submit -->
+											<td>
+												<!-- Save -->
+												<button
+												ng-disabled="button.question.state.disabled || loading"
+												ng-click="submit()"
+												ng-class="button.question.state.class"
+												class="ui tiny button"
+												type="submit">
+													<i ng-class="button.question.state.icon" class="icon"></i>&nbsp;
+													{{ button.question.state.title }}
+												</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<!-- end questions -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

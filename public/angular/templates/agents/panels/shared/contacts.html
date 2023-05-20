@@ -1,0 +1,130 @@
+<!-- CSAT BREAKDOWN PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">Contacts</div>
+
+		<!-- content -->
+		<div class="description">
+			<table class="ui very basic compact table">
+				<thead>
+					<tr>
+						<th>&nbsp;</th>
+						<th><span rel="tooltip" data-original-title="Period">Period</span></th>
+						<th><span rel="tooltip" data-original-title="Today Only">Today</span></th>
+					</tr>
+				</thead>
+				<tbody>
+
+					<!-- CONTACTS PER DAY -->
+					<tr ng-show="userinfo.dept == 'CS'" class="ng-hide">
+						<th>
+							<span rel="tooltip" data-original-title="Contacts Per Day">
+								<em>CPD</em>
+							</span>
+						</th>
+						<td class="{{ cpdPeriodStatus }}">
+							<span rel="tooltip" data-original-title="{{ api.statistics.period.cph }} CPH * {{ api.statistics.daily_expected_available_hours.overall.total }} Daily Expected Hours">
+								<strong>{{ api.statistics.period.cpd | number: 2 }}</strong>
+							</span>
+						</td>
+						<td class="{{ cpdTodayStatus }}">
+							<span rel="tooltip" data-original-title="{{ api.statistics.contacts.today.cph }} CPH * {{ api.statistics.daily_expected_available_hours.today.total }} Daily Expected Hours">
+								{{ api.statistics.today.cpd | number: 2 }}
+							</span>
+						</td>
+					</tr>
+
+					<!-- CONTACTS PER HOUR -->
+					<tr ng-show="userinfo.dept == 'CS'" class="ng-hide">
+						<th>
+							<span rel="tooltip" data-original-title="Contacts Per Hour"><em>CPH</em></span>
+						</th>
+						<td>
+							<span rel="tooltip" data-original-title="{{ api.statistics.contacts.overall.total }} contacts / {{ api.statistics.available_hours.overall.total }} avail hours">
+								{{ api.statistics.period.cph | number: 2 }}
+							</span>
+						</td>
+						<td>
+							<span rel="tooltip" data-original-title="{{ api.statistics.contacts.today.total }} contacts / {{ api.statistics.available_hours.today.total }} avail hours">
+								{{ api.statistics.today.cph | number: 2 }}
+							</span>
+						</td>
+					</tr>
+
+					<!-- VOLUME -->
+					<tr>
+						<th>
+							<span rel="tooltip" data-original-title="Total Volume">
+								<em>VOL</em>
+							</span>
+						</th>
+						<td>
+							<span rel="tooltip" data-original-title="You've handled {{ api.statistics.contacts.overall.total }} interactions this period.">
+								{{ api.statistics.period.volume_overall }}
+							</span>
+						</td>
+						<td>
+							<span rel="tooltip" data-original-title="You've handled {{ api.statistics.contacts.today.total }} interactions today.">
+								{{ api.statistics.today.volume_overall }}
+							</span>
+						</td>
+					</tr>
+
+					<!-- CHAT CONTACTS -->
+					<tr>
+						<th>
+							<i class="large comment icon" rel="tooltip" data-original-title="Chat Contacts"></i>
+						</th>
+						<td>
+							<span rel="tooltip" data-original-title="You took {{ api.statistics.contacts.overall.chats }} chats this period.">
+								{{ api.statistics.period.volume_chats }}
+							</span>
+						</td>
+						<td>
+							<span rel="tooltip" data-original-title="You took {{ api.statistics.contacts.today.chats }} chats today.">
+								{{ api.statistics.today.volume_chats }}
+							</span>
+						</td>
+					</tr>
+
+					<!-- PHONE CONTACTS -->
+					<tr>
+						<th>
+							<i class="large phone icon" rel="tooltip" data-original-title="Phone Contacts"></i>
+						</th>
+						<td>
+							<span rel="tooltip" data-original-title="You took {{ api.statistics.contacts.overall.calls }} calls this period.">
+								{{ api.statistics.period.volume_calls }}
+							</span>
+						</td>
+						<td>
+							<span rel="tooltip" data-original-title="You took {{ api.statistics.contacts.today.calls }} calls today.">
+								{{ api.statistics.today.volume_calls }}
+							</span>
+						</td>
+					</tr>
+
+					<!-- TICKET CONTACTS -->
+					<tr>
+						<th>
+							<i class="large ticket icon" rel="tooltip" data-original-title="Ticket Contacts"></i>
+						</th>
+						<td>
+							<span rel="tooltip" data-original-title="You responded to {{ api.statistics.contacts.overall.tickets }} tickets this period.">
+								{{ api.statistics.period.volume_tickets }}
+							</span>
+						</td>
+						<td>
+							<span rel="tooltip" data-original-title="You responded to {{ api.statistics.contacts.today.tickets }} tickets today.">
+								{{ api.statistics.today.volume_tickets }}
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+</div>

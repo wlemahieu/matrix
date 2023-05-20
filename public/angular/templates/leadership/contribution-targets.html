@@ -1,0 +1,96 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Contribution Targets</h3>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="sixteen wide column">
+			<!-- start grid -->
+			<div class="ui grid">
+
+				<!-- first row, month selector -->
+				<div class="row">
+					<div class="three wide column">
+						<md-datepicker ng-disabled="loading" ng-model="selectedDate" md-placeholder="MM/DD/YYYY"></md-datepicker>
+					</div>
+					<div ng-show="selectedMonthVerbose" class="three wide column ng-hide">
+						<div class="ui large pink horizontal label">{{ selectedMonthVerbose }}</div>
+					</div>
+				</div>
+
+				<!-- second row, initial loader -->
+				<div ng-show="loaders.initial.contributionTargets" class="row ng-hide">
+			 		<div class="eight wide column">
+						<i class="huge loading spinner icon"></i>
+					</div>
+				</div>
+
+				<!-- contribution targets form / submission -->
+				<div ng-show="!loaders.initial.contributionTargets" class="ng-hide">
+
+					<!-- start contribution form -->
+					<form name="contribution_targets" novalidate>
+
+						<!-- third row, start form table -->
+						<div class="row">
+							<div class="eight wide column">
+								<table class="ui very basic compact table">
+									<thead>
+										<tr>
+											<th>
+												Day
+											</th>
+											<th>
+												Full-Time
+											</th>
+											<th>
+												Part-Time
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr ng-repeat="(key, obj) in form.days">
+											<td>
+												{{ key }}
+											</td>
+											<td>
+												<div class="ui input">
+													<input ng-model="obj.ft" ng-value="obj.ft" ng-disabled="form.disabled == 1"/>
+												</div>
+											</td>
+											<td>
+												<div class="ui input">
+													<input ng-model="obj.pt" ng-value="obj.pt" ng-disabled="form.disabled == 1"/>
+												</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<!-- end 3rd row -->
+
+						<!-- 4th row, submission button -->
+						<div ng-show="!loaders.initial.contributionTargets" class="row ng-hide">
+							<div class="six wide column">
+								<button
+								ng-disabled="button.active.disabled == true || loading == 1"
+								ng-click="submit()"
+								ng-class="button.active.class"
+								class="ui button"
+								type="submit">
+									<i ng-class="button.active.icon" class="icon"></i>&nbsp;
+									{{ button.active.title }}
+								</button>
+							</div>
+						</div>
+						<!-- end 4th row -->
+					</form>
+					<!-- end form -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

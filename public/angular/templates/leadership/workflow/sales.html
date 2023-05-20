@@ -1,0 +1,214 @@
+<div class="ng-hide ui grid" ng-show="userinfo.dept === 'Sales'">
+	
+	<!-- 1st Row -->
+	<div class="row">
+
+		<div class="three wide column">
+			<div class="ui card">
+
+				<!-- Header -->
+				<div class="content">
+					<div class="header">
+						<i class="chat icon"></i> Queue Info
+					</div>
+				</div>
+
+				<div class="content">
+					<div class="ui list">
+						<div class="item">
+							<i class="fa fa-comment"></i>&nbsp;
+							<strong>{{ api.workflow.chatsQueued }} queued</strong> @ <em>{{ api.workflow.chatWaitTime }}</em>
+						</div>
+						<div class="item">
+							<i class="fa fa-headphones"></i>&nbsp;
+							<strong>{{ api.workflow.callsQueued }} queued</strong> @ <em>{{ api.workflow.callWaitTime }}</em>
+						</div>
+						<div class="item">
+							<i class="fa fa-ticket"></i>&nbsp;
+							<strong>{{ api.workflow.ticketsQueued }} queued</strong>
+						</div>
+						<div class="item">
+							<i class="fa fa-ticket"></i>&nbsp;
+							<em><strong>{{ api.workflow.ticketsQueuedOver20Hours }}</strong> over 20hrs</em>
+						</div>
+						<div class="item">
+							<i class="fa fa-ticket"></i>&nbsp;
+							<em><strong>{{ api.workflow.ticketsQueuedOver12Hours }}</strong> over 12hrs</em>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Agents -->
+		<div class="three wide column">
+			<div class="ui card">
+
+				<!-- Header -->
+				<div class="content">
+					<div class="header">
+						<i class="chat icon"></i> Agents
+					</div>
+				</div>
+
+				<!-- Body -->
+				<div class="content">
+
+					<!-- chats queued & longest wait time -->
+					<strong>{{ api.workflow.callsQueued }} queued</strong> @ <em>{{ api.workflow.callWaitTime }}</em>
+
+					<br style="clear:both;"/>
+
+					<div class="ui list">
+
+						<!-- iterate over users -->
+						<div class="item" ng-repeat="(username, object) in api.workflow.agents.all">
+
+							<!-- Accepting Chats -->
+							<span ng-click="open( username, 'chats', 'available', 0 )" ng-class="{ workingEarly: object.workingEarly === 1 }">
+								<i ng-if="object.channels_available.chats === 1" class="small green comment icon"></i>
+							</span>
+
+							<!-- Not Accepting Chats -->
+							<span ng-click="open( username, 'chats', 'unavailable', 0 )" ng-class="{ workingEarly: object.workingEarly === 1 }">
+								<i ng-if="object.channels_available.chats === 2" class="small yellow comment icon"></i>
+							</span>
+
+							<!-- Offline Chats -->
+							<span ng-click="open( username, 'chats', 'offline', 0 )" ng-class="{ workingEarly: object.workingEarly === 1 }">
+								<i ng-if="object.channels_available.chats === 0" class="small comment icon"></i>
+							</span>
+
+							<!-- Accepting Calls -->
+							<span ng-click="open( username, 'calls', 'available', object.asterisk_id )" ng-class="{ workingEarly: object.workingEarly === 1 }">
+								<i title="Accepting calls" ng-if="object.channels_available.calls === 1" class="small green headphone icon"></i>
+							</span>
+
+							<!-- Not Accepting Calls -->
+							<span ng-click="open( username, 'calls', 'unavailable', object.asterisk_id )" ng-class="{ workingEarly: object.workingEarly === 1 }">
+								<i title="Not accepting calls" ng-if="object.channels_available.calls === 2" class="small yellow headphone icon"></i>
+							</span>
+
+							<!-- Offline Calls -->
+							<span ng-click="open( username, 'calls', 'unavailable', object.asterisk_id )" ng-class="{ workingEarly: object.workingEarly === 1 }">
+								<i title="Logged out of phones" ng-if="object.channels_available.calls === 0" class="small headphone icon"></i>
+							</span>
+
+							<!-- Agent Username -->
+							<span ng-class="{ workingEarly: object.workingEarly === 1 }">{{ object.name }}</span>
+
+							<!-- Active Interactions -->
+							<span ng-repeat="(touches, subObject) in object">
+
+								<!-- Chats -->
+								<i ng-repeat="(channel, data) in subProp.chats track by $index" ng-class="{ 'red': data >= 1200, 'blue': data < 1200 }" class="small comments icon interaction" data-content="{{ data | secondsReadable : 'short' }}"></i>
+								
+
+								<!-- Calls -->
+								<i ng-repeat="(channel, data) in subProp.calls track by $index" ng-class="{ 'red': data >= 1200, 'blue': data < 1200 }" class="small headphone icon interaction" data-content="{{ data | secondsReadable : 'short' }}"></i>
+
+								<!-- Tickets -->
+								<a 
+								ng-repeat="(channel, data) in subObject.tickets track by $index" 
+								target="_blank" 
+								href="https://hostops.mediatemple.net/util/hoframe.php?url=%2Faccount%2F%3Fview%3Dticket%26id%3D{{ data }}" 
+								title="t:{{ data }}">
+									<i class="small ticket icon"></i>
+								</a>
+							</span>
+
+							<i tooltip-placement="top" tooltip="Wrap-up" ng-if="object.wrap_up === 1" class="fa fa-exchange" style="color:#F3978B;"></i>
+						</div>
+						<!-- end user list ngRepeat -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Active Exceptions -->
+		<div class="five wide column">
+			<div class="ui item">
+
+				<h3>Active Exceptions</h3>
+				
+				<div class="scrollable-panel">
+					<div class="ui list">
+
+						<!-- filters incomplete -->
+						<div class="ui mini buttons">
+							<button 
+							ng-class="{ 'blue': activeFilter === 'all' }" 
+							class="ui button" 
+							ng-click="activeExceptionsFilter('all')">All</button>
+
+							<button 
+							ng-class="{ 'blue': activeFilter === 'Break' }" 
+							class="ui button" 
+							ng-click="activeExceptionsFilter('Break')">Break</button>
+
+							<button 
+							ng-class="{ 'blue': activeFilter === 'Lunch' }" 
+							class="ui button" 
+							ng-click="activeExceptionsFilter('Lunch')">Lunch</button>
+
+							<button 
+							ng-class="{ 'blue': activeFilter === 'Other' }" 
+							class="ui button" 
+							ng-click="activeExceptionsFilter('Other')">Other</button>
+
+							<button 
+							ng-class="{ 'blue': activeFilter === 'Absence' }" 
+							class="ui button" 
+							ng-click="activeExceptionsFilter('Absence')">Absence</button>
+						</div>
+						<!-- end filters -->
+
+						<!-- begin line items -->
+						<table class="ui very basic compact table">
+							<thead>
+								<tr>
+									<th>Minutes</th>
+									<th>Type</th>
+									<th>Agent</th>
+									<th>Channel</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+								ng-show="activeFilter === object.class || ( activeFilter === 'all' && object.class !== 'Absence' )"
+								ng-repeat="(key, object) in api.workflow.workflowScheduleItemsNow"
+								class="ng-hide"
+								ng-class="object.class">
+									<td>{{ object.time }}</td>
+									<td>{{ object.type }}</td>
+									<td>{{ object.name }}</td>
+									<td>{{ object.channel }}</td>
+								</tr>
+							</tbody>
+						</table>
+						<!-- end line items -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- end active exceptions -->
+
+		<!-- Logged-out Agents -->
+		<div class="three wide column">
+			<div class="ui card">
+				<div class="content">
+					<div class="header">Logged-out</div>
+				</div>
+				<div class="content">
+					<div class="ui list">
+						<!-- iterate over logged out users -->
+						<div class="item" ng-repeat="(key, obj) in api.workflow.notLoggedIntoChannel">
+							{{ obj.name }}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END ENTIRE ROW -->

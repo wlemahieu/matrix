@@ -1,0 +1,77 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Unhandled Alerts</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="sixteen wide column">
+
+			<!-- Loader -->
+			<div 
+			ng-hide="loaders.initial.alerts === false">
+				<i class="big blue loading circle notched icon"></i> Loading Alerts...
+			</div>
+
+			<!-- Content -->
+			<div 
+			ng-cloak 
+			ng-show="loaders.initial.alerts === false">
+
+				<!-- Unhandle Alerts Count -->
+				<div class="ui red statistic">
+					<div class="value">
+						{{ count }}
+					</div>
+				</div>
+
+				<br style="clear:both;"/>
+
+				<!-- Team Filter (managers only) -->
+				<div ng-show="userinfo.type == 'Manager'" class="ng-hide">
+					<team-filter></team-filter>
+				</div>
+
+				<!-- Unhandle Alerts Line Items -->
+				<table class="ui celled table">
+					<thead>
+						<tr>
+							<th>
+								<a ng-click="alertsOrderBy = 'entdate'; alertsReverseSort = !alertsReverseSort">
+					         		Date
+					        	</a>
+					        </th>
+							<th>
+								<a ng-click="alertsOrderBy = 'username'; alertsReverseSort = !alertsReverseSort">
+					         		Username
+					        	</a>
+					        </th>
+							<th>
+								<a ng-click="alertsOrderBy = 'team'; alertsReverseSort = !alertsReverseSort">
+					         		Team
+					        	</a>
+					        </th>
+							<th>Message</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="(key, obj) in api.alerts.line_items | filter: filter | orderBy:alertsOrderBy:alertsReverseSort">
+							<td>
+								{{ obj.entdate }}
+							</td>
+							<td>
+								{{ obj.username }}
+							</td>
+							<td>
+								{{ obj.team }}
+							</td>
+							<td>
+								{{ obj.message }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

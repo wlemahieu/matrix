@@ -1,0 +1,13 @@
+<div class="ui comments">
+	<h3 class="ui dividing header">Customer Comments</h3>
+	<div class="comment" ng-repeat="comment in api.statistics.comments">
+		<div class="content">
+			<div class="metadata">
+				<span class="date">{{ comment.datetime }}</span>
+			</div>
+			<div class="text">
+				{{ comment.comment }}
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,269 @@
+<div class="ui grid container">
+	<div class="row">
+		<div class="sixteen wide column">
+			<h3>Attendance</h3>
+		</div>
+	</div>
+
+	<!-- first row -->
+	<div ng-cloak ng-show="!loaders.inline.aaa" class="row">
+		<div class="sixteen wide tablet six wide computer column">
+			<!-- agent selector -->
+			<agent-selector></agent-selector>
+			<!-- refresh icon -->
+			<div ng-cloak ng-show="selectedAgent && selectedAgent != 'Select a user' && !loaders.inline.ace" class="ui button" ng-click="refreshAll()">
+				<i class="refresh icon"></i>
+			</div>
+		</div>
+	</div>
+
+	<!-- other first row -->
+	<div ng-cloak ng-show="loaders.inline.ace" class="row">
+		
+		<!-- content loader -->
+		<div class="sixteen wide column">
+			<i class="loading spinner icon"></i>&nbsp; Loading availability, clocks, and exceptions for <strong>{{ selectedAgent }}</strong> ...
+		</div>
+	</div>
+
+	<!-- New / Edit Clock/Exception Actions -->
+	<div id="single-attendance-item" ng-show="manipulatedItem" class="ng-hide row ui segment">
+
+		<div class="sixteen wide column">
+
+			<!-- Form Div -->
+	      	<form class="ui form">
+	      		<div class="field">
+	      			<div class="four fields">
+
+	      				<!-- Exceptions Dropdown -->
+	      				<div ng-cloak ng-show="apiCall == 'attendanceExceptions'" class="field">
+	      					<label>Exceptions</label>
+	      					<div class="ui selection dropdown">
+	      						<input type="hidden" ng-model="manipulatedItem.type" />
+	      						<i class="dropdown icon"></i>
+	      						<div class="active text">{{ manipulatedItem.type }}</div>
+	      						<div class="menu">
+	      							<div class="item" ng-repeat="exception in exceptions" ng-click="selectException(exception)">{{ exception }}</div>
+	      						</div>
+	      					</div>
+	      				</div>
+
+	      				<!-- Start Time -->
+	      				<div class="field">
+	      					<label>Start Time</label>
+	      					<input ng-model="manipulatedItem.start" type="text" />
+	      				</div>
+
+	      				<!-- End Time -->
+	      				<div class="field">
+	      					<label>End Time</label>
+	      					<input ng-model="manipulatedItem.end" type="text" />
+	      				</div>
+
+	      				<!-- Status -->
+	      				<div class="field">
+	      					<label>Status</label>
+	      					<div class="ui selection dropdown">
+	      						<input type="hidden" ng-model="manipulatedItem.active">
+	      						<i class="dropdown icon"></i>
+	      						<div class="active text">{{ manipulatedItem.activeVerbose }}</div>
+	      						<div class="menu">
+	      							<div class="item" data-value="1" ng-click="activeItem(true)">Active</div>
+	      							<div class="item" data-value="0" ng-click="activeItem(false)">Inactive</div>
+	      						</div>
+	      					</div>
+	      				</div>
+
+	      				<div class="field">
+	      					<label>Actions</label>
+	      					<button
+							ng-disabled="button.state.disabled"
+							ng-click="manipulateItem(manipulatedItem.id)"
+							ng-class="button.state.class"
+							class="ui button">
+								<i ng-class="button.state.icon" class="icon"></i>&nbsp;
+								{{ button.state.title }}
+							</button>
+
+		    				<div 
+		    				ng-show="!saving"
+		    				ng-click="manipulatedItem = undefined;"
+		    				class="ng-hide ui button">
+		    					Cancel
+		    				</div>
+		    			</div>
+	      			</div>
+	      		</div>
+	      	</form>
+		    <!-- End Form Div-->
+		</div>
+	</div>
+    <!-- end 2nd row -->
+
+	<!-- 2nd row (content) -->
+	<div ng-cloak ng-show="selectedAgent && selectedAgent != 'Select a user' && !loaders.inline.ace" class="row">
+
+		<div class="sixteen wide column">
+
+			<!-- tab toggle buttons -->
+			<div class="ui top attached tabular menu">
+				<a class="item active" data-tab="first">
+					<i class="rocket icon"></i>Availability
+				</a>
+				<a class="item" data-tab="second">
+					<i class="clock icon"></i>Clocks
+				</a>
+				<a class="item" data-tab="third">
+					<i class="asterisk icon"></i>Exceptions
+				</a>
+			</div>
+
+			<!-- start vvailability tab -->
+			<div class="ui bottom attached tab segment active" data-tab="first">
+				<table class="ui very basic compact table">
+					<tr>
+						<th>
+							<a ng-click="orderByField('availability', 'entdate')">
+								Date
+							</a>
+						</th>
+						<th>
+							<a ng-click="orderByField('availability', 'in_queue_time')">
+								In Queue Time
+							</a>
+						</th>
+						<th>
+							<a ng-click="orderByField('availability', 'expected_time')">
+								Expected Time
+							</a>
+						</th>
+					</tr>
+					<tr ng-repeat="availability in api.availabilityMarks | orderBy:orderBy.availability:reverseSort.availability track by $index">
+						<td>{{ availability.entdate }}</td>
+						<td>{{ availability.in_queue_time | secondsReadable : 'short' : true }}</td>
+						<td>{{ availability.expected_time | secondsReadable : 'short' : true }}</td>
+					</tr>
+				</table>
+			</div>
+			<!-- end availability tab -->
+
+			<!-- start clocks tab -->
+			<div class="ui bottom attached tab segment" data-tab="second">
+
+				<!-- new clock button -->
+				<button ng-click="openModal('new', 'attendanceClocks', 'clock')" class="ui small teal button">
+					New Clock
+				</button>
+
+				<!-- existing clocks line items -->
+				<table class="ui very basic compact table">
+					<thead>
+						<tr>
+							<th>
+								<a ng-click="orderByField('clocks', 'start')">
+									Start Time
+								</a>
+							</th>
+							<th>
+								<a ng-click="orderByField('clocks', 'end')">
+									End Time
+								</a>
+							</th>
+							<th>
+								<a ng-click="orderByField('clocks', 'duration')">
+									Duration
+								</a>
+							</th>
+							<th>Edit</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- iterate over existing clocks -->
+						<tr 
+						ng-repeat="clock in api.attendanceClocks | orderBy:orderBy.clocks:reverseSort.clocks track by $index" 
+						ng-class="{ 'negative': clock.active === 0 }">
+							<td>{{ clock.start | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+							<td>{{ clock.end | date: 'yyyy-MM-dd HH:mm:ss' }}</td>
+							<td>{{ clock.duration | secondsReadable : 'short' : true }}</td>
+							
+							<!-- edit clock button -->
+							<td>
+								<a class="ui mini grey button" ng-click="openModal('edit', 'attendanceClocks', clock.id)">
+									<i class="pencil icon"></i>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<!-- end clocks tab -->
+
+			<!-- start exceptions tab -->
+			<div class="ui bottom attached tab segment" data-tab="third">
+
+				<!-- new exception button -->
+				<button ng-click="openModal('new', 'attendanceExceptions', 'exception')" class="ui small teal button">
+					New Exception
+				</button>
+
+				<!-- existing exceptions line items -->
+				<table class="ui very basic compact table">
+					<thead>
+						<tr>
+							<th>
+								<a ng-click="orderByField('exceptions', 'type')">
+									Exception
+								</a>
+							</th>
+							<th>
+								<a ng-click="orderByField('exceptions', 'start')">
+									Start Time
+								</a>
+							</th>
+							<th>
+								<a ng-click="orderByField('exceptions', 'end')">
+									End Time
+								</a>
+							</th>
+							<th>
+								<a ng-click="orderByField('exceptions', 'duration')">
+									Duration
+								</a>
+							</th>
+							<th>Edit</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr 
+						ng-repeat="exception in api.attendanceExceptions | orderBy:orderBy.exceptions:reverseSort.exceptions track by $index"
+						ng-class="{ 'negative': exception.active === 0 }">
+							<td>
+								{{ exception.type }}
+							</td>
+							<td>
+								{{ exception.start | date: 'yyyy-MM-dd HH:mm:ss' }}
+							</td>
+							<td>
+								{{ exception.end | date: 'yyyy-MM-dd HH:mm:ss' }}
+							</td>
+							<td>
+								{{ exception.duration | secondsReadable : 'short' : true }}
+							</td>
+							<!-- edit exception button -->
+							<td>
+								<a class="ui mini grey button" ng-click="openModal('edit', 'attendanceExceptions', exception.id)">
+									<i class="pencil icon"></i>
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<!-- end exceptions tab -->
+		</div>
+		<!-- end column -->
+	</div>
+	<!-- end content row -->
+</div>
+<!-- end grid -->

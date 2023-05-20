@@ -1,0 +1,98 @@
+<?php
+
+/**
+ * Chat Visitors
+ *
+ * This cron is responsible for updating the information inside of the `chats_current_visitors` table.
+ * This cron is run every minute, however, the script will hit the API as many times as possible within that minute, sleeping for 4 seconds after each call.
+ * This essentially amounts to a 5-second interval for data pull / cleanup.
+ */
+require '../application/model/Chats.php';
+require '../application/model/Logger.php';
+
+$Chats = new Chats($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$url = 'https://api.livechatinc.com/visitors';
+
+// the first time the script is being run (via cron or command line tests)
+$start = time();
+
+// the difference between start and now is zero, at the moment
+$diff = 0;
+$sleepInterval = 4;
+
+// if we are within the 1 minute of this cron running, loop over again.
+while($diff < 60) {
+
+	$response = $Cron->livechatCurl($url);
+
+	// logging non-200s
+	$Logger->logAPI($response->httpcode);
+
+	if($response->httpcode === 200) {
+
+		foreach($response->data as $visitor) {
+
+			if($visitor->group != 5 && $visitor->group != 4 && ($visitor->state == 'chatting' || $visitor->state == 'queued')) {
+
+				$agentUsername = explode('@', @$visitor->operators[0]->id);
+
+				if($visitor->queue_start_time != "") {
+					$queue_start_time = date('Y-m-d H:i:s', $visitor->queue_start_time);
+				}
+				else {
+					$queue_start_time = NULL;
+				}
+
+				if($visitor->chat_start_time_ts != "") {
+					$chat_start_time_ts = date('Y-m-d H:i:s', $visitor->chat_start_time_ts);
+				}
+				else {
+					$chat_start_time_ts = NULL;
+				}
+
+				$payload = new stdClass();
+				$payload->chat_id = @$visitor->chat_id;
+				$payload->queue_start_time = $queue_start_time;
+				$payload->chat_start_time = $chat_start_time_ts;
+				$payload->chat_group = @$visitor->group;
+				$payload->issue = @$visitor->prechat_survey[0]->value;
+				$payload->question = @$visitor->prechat_survey[1]->value;
+				$payload->state = @$visitor->state;
+				$payload->agent = @$agentUsername[0];
+
+				// grab account number, contact number, and customer name from custom-variables variable.
+				if(isset($visitor->custom_variables)) {
+
+					$x = explode('&', $visitor->custom_variables);
+					foreach($x as $str) {
+						$y = explode('=', $str);
+						$lowercase = strtolower($y[0]);
+						$value = urldecode($y[1]);
+
+						// e.g Account  288510  Contact  477765  Name  Francisco%20Gutierrez 
+						$payload->$lowercase = $value;
+					}
+				}
+
+				//the name gets passed in to the custom variables too but we dont need it since its always defined anyways under ->name
+				//this overwrites the name pulled from custom-variables, which is 99.9% of the time going to be the same anyways.
+				$payload->name = @$visitor->name;
+				//print_R($payload);
+
+				$Chats->upsertChatVisitors($payload);
+			}
+		}
+
+		$Cron->cleanTable('chats_current_visitors', $sleepInterval);
+
+		// find the difference in seconds between now and the very first time this script was run
+		$diff = strtotime('now') - $start;
+
+		sleep($sleepInterval);
+	} else {
+		break;
+	}
+}

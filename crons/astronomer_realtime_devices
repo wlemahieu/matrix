@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * Phone Devices
+ *
+ * This cron is simply responsible for fetching and storing the data for each phone device in the system.
+ */
+require '../application/model/AstronomerRealtime.php';
+require '../application/model/Logger.php';
+
+$AstronomerRealtime = new AstronomerRealtime($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+$response = $Cron->astronomerCurl('https://astronomer.mtvoip.net/api/realtime/devices');
+
+// logging non-200s
+$Logger->logAPI($response->httpcode);
+
+if($response->httpcode === 200) {
+
+	// iterate through phone device
+	foreach($response->data as $key => $object) {
+		
+		// queue payload
+		$payload = new stdClass();
+		$payload->device_number = $object->device_number;
+		$payload->extension = $object->extension;
+		$payload->name = $object->name;
+
+		// upsert this user's phone device information
+		$AstronomerRealtime->upsertPhoneDevice($payload);
+	}
+
+	$Cron->cleanTable('astronomer_realtime_devices', NULL);
+}

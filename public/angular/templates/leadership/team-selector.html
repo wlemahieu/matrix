@@ -1,0 +1,4 @@
+<select class="ui search selection dropdown" id="team-selector" ng-model="selectedTeam" ng-change="selectTeam()">
+	<option selected>Select a team</option>
+	<option ng-repeat="team in api.teams | filter:teamsFilter track by $index" ng-value="$index">{{ team.name }}</option>
+</select>

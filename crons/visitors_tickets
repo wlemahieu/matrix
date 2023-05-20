@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * Tickets Queued
+ *
+ * This cron is responsible for updating the information inside of the `tickets_currently_queued` table.
+ * We are currently only bringing in CS and Billing tickets to the tickets_currently_queued table.
+ * Notice that we are also connecting to Semaphore in this script
+ */
+
+require '../application/model/Semaphore.php';
+require '../application/model/Tickets.php';
+
+$Semaphore = new Semaphore($this->semaphore_db);
+$Tickets = new Tickets($this->db);
+$Cron = new Cron();
+
+foreach($Semaphore->fetchTickets() as $key => $ticket) {
+
+	$payload = new stdClass();
+	$payload->id = $ticket->id;
+	$payload->queue_number = $ticket->assignment;
+	$payload->subject = $ticket->subject_txt;
+	$payload->expanded_subject = $ticket->expanded_subject;
+	$payload->account_id = $ticket->account_id;
+	$payload->user_id = $ticket->user_id;
+	$payload->service_id = $ticket->service_id;
+	$payload->date_last_correspond = $ticket->date_last_correspond;
+	$payload->date_assigned_response = $ticket->date_assigned_response;
+	$payload->date_customer_response = $ticket->date_customer_response;
+	$payload->date_locked = $ticket->date_locked;
+	$payload->agent_locked = $ticket->agent_locked;
+
+	$Tickets->upsertTicketsQueued($payload);
+}
+
+$Cron->cleanTable('tickets_currently_queued', NULL);

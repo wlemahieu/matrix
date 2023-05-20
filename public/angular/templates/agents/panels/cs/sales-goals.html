@@ -1,0 +1,38 @@
+<!-- SALES GOALS PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">Sales</div>
+
+		<!-- content -->
+		<div class="description">
+
+			<div class="ui mini green horizontal statistic">
+				<div class="value">
+					${{ api.statistics.sales.dept_goal_amount.amount | number:2 }}
+				</div>
+			</div>
+
+			<br style="clear:both;"/>
+
+			<div class="ui mini blue statistic">
+				<div class="value">
+					${{ api.statistics.sales.dept_goal_expected.amount | number:2 }}
+				</div>
+				<div class="label">
+					Goal
+				</div>
+			</div>
+
+			<!-- sales department goal completion percentage -->
+			<div class="ui list">
+				<div class="ui blue progress" id="sales_goal_perc">
+					<div class="bar">
+						<div class="progress"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

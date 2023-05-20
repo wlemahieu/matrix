@@ -1,0 +1,45 @@
+<!-- ELIGIBILITY PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">Eligibility</div>
+
+		<!-- content -->
+		<div class="description">
+
+			<strong>If your</strong>...
+			<br style="clear:both"/>
+
+			<span ng-if="api.statistics.period.cpd_eligible" class="ui green label">
+				<i class="checkmark icon"></i>
+			</span>
+
+			<span ng-if="!api.statistics.period.cpd_eligible" class="ui red label">
+				<i class="close icon"></i>
+			</span>
+
+			<span>&nbsp;<strong>CPD</strong> ({{ api.statistics.period.cpd }}) is <strong>greater</strong> than the CPD bonus minimum ({{ params.contacts_per_day_bonus }}) &amp;</span>
+			<br style="clear:both"/>
+
+			<span ng-if="api.statistics.period.availability_eligible" class="ui green label">
+				<i class="checkmark icon"></i>
+			</span>
+			<span ng-if="!api.statistics.period.availability_eligible" class="ui red label">
+				<i class="close icon"></i>
+			</span>
+			<span>&nbsp;<strong>Availability</strong> ({{ api.statistics.period.availability.toFixed(2) }}%) is <strong>greater</strong> than the Availability bonus minimum ({{ params.availability_bonus }}%)</span>
+			<br style="clear:both"/>
+
+			<!-- Bonus Eligibility Indicator -->
+			<span ng-if="api.statistics.period.eligible" class="ui green label">
+				You're Bonus Eligible!&nbsp;
+				<i class="checkmark icon"></i>
+			</span>
+			<span ng-if="!api.statistics.period.eligible" class="ui red label">
+				You're Not Bonus Eligible&nbsp;
+				<i class="close icon"></i>
+			</span>
+		</div>
+	</div>
+</div>

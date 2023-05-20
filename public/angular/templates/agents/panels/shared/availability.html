@@ -1,0 +1,51 @@
+<!-- AVAILABILITY PANEL -->
+<div class="ui card">
+	<div class="content">
+
+		<!-- header -->
+		<div class="header">Availability</div>
+
+		<!-- content -->
+		<div class="description">
+
+			<!-- pay period -->
+			<a class="ui grey ribbon label">
+				<i class="calender icon"></i> Pay Period
+			</a>
+			<div ng-class="availPeriodStatus" class="ui progress" id="availability_overall">
+				<div class="bar">
+					<div class="progress"></div>
+				</div>
+				<div class="label">Overall</div>
+			</div>
+			<!-- end pay period -->
+
+			<!-- today -->
+			<a class="ui blue ribbon label">
+				<i class="calender icon"></i> Today
+			</a>
+			<div ng-class="availTodayStatus" class="ui progress" id="availability_today">
+				<div class="bar">
+					<div class="progress"></div>
+				</div>
+				<div class="label">Overall</div>
+			</div>
+			<!-- end today -->
+
+			<div class="ui label">
+				{{ api.statistics.period.total_available_time }}
+			</div>Available
+
+			<div class="ui label">
+				{{ api.statistics.period.total_exceptions }}
+			</div>Exception
+
+			<div class="ui label">
+				{{ api.statistics.period.total_in_queue_time }}
+			</div>In Queue
+
+		</div>
+		<!-- end description -->
+	</div>
+	<!-- end content -->
+</div>

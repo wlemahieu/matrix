@@ -1,0 +1,200 @@
+<!-- checkins tab -->
+<div class="ng-hide" ng-show="tab === 'checkins' || userinfo.type === 'Agent'">
+
+	<!-- Leadership Filters -->
+	<div 
+	ng-show="userinfo.type === 'Supervisor' || userinfo.type === 'Manager'"
+	class="ui tiny buttons ng-hide">
+		<button 
+		ng-class="{ 'blue': checkinActiveTab === 'not_presented' }"
+		ng-click="filterCheckins('not_presented')" 
+		class="ui button">
+			{{ api.checkins.counters.not_presented }} Not Presented
+		</button>
+		<button 
+		ng-class="{ 'blue': checkinActiveTab === 'presented' }"
+		ng-click="filterCheckins('presented')" 
+		class="ui button">
+			{{ api.checkins.counters.presented }} Presented
+		</button>
+		<button 
+		ng-class="{ 'blue': checkinActiveTab === 'incomplete' }"
+		ng-click="filterCheckins('incomplete')" 
+		class="ui button">
+			{{ api.checkins.counters.incomplete }} Incomplete
+		</button>
+	</div>
+
+	<!-- Agent Filters -->
+	<div 
+	ng-show="userinfo.type == 'Agent'"
+	class="ui tiny buttons ng-hide">
+		<button 
+		ng-class="{ 'blue': checkinActiveTab === 'not_accepted' }"
+		ng-click="filterCheckins('not_accepted')" 
+		class="ui button">
+			{{ api.checkins.counters.not_accepted }} Not Accepted
+		</button>
+		<button 
+		ng-class="{ 'blue': checkinActiveTab === 'accepted' }"
+		ng-click="filterCheckins('accepted')" 
+		class="ui button">
+			{{ api.checkins.counters.accepted }} Accepted
+		</button>
+	</div>
+
+	<br style="clear:both;"/>
+
+	<!-- Checkins List -->
+	<table class="ui single line table">
+		<thead>
+			<tr>
+				<th>
+					<i class="legal icon"></i>Actions
+				</th>
+
+				<!-- Status -->
+				<th class="three wide">
+					<i class="heart icon"></i>Status
+				</th>
+
+				<!-- Agent -->
+				<th 
+				ng-show="userinfo.type === 'Supervisor' || userinfo.type === 'Manager'"
+				class="two wide ng-hide">
+					<i class="user icon"></i>Username
+				</th>
+
+				<!-- Date -->
+				<th>
+					<i class="calendar icon"></i>Touch Date
+				</th>
+
+				<!-- Account Number -->
+				<th>
+					<i class="folder icon"></i>Account #
+				</th>
+
+				<!-- Contact Type -->
+				<th>
+					<i class="announcement icon"></i>Type
+				</th>
+
+				<!-- Support Request or Livechat # -->
+				<th>
+					<i class="comments icon"></i>Support #
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+
+			<!-- iterate through checkins -->
+			<tr ng-repeat="(key , obj) in api.checkins.line_items | filter: checkinFilter track by obj.id">
+				
+				<!-- edit checkin -->
+				<td>
+					<button
+					ng-show="obj.presented == 0"
+					ng-click="toggleManipulate('edit', obj.id)"
+					class="ui mini button ng-hide">
+						<i class="pencil black icon"></i>Edit
+					</button>
+					<button
+					ng-click="view(obj.id)"
+					class="ui mini button black">
+						<i class="eye icon"></i>View
+					</button>
+				</td>
+
+				<!-- Lead Actions / Statuses -->
+				<td 
+				ng-show="userinfo.type === 'Supervisor' || userinfo.type === 'Manager'"
+				class="ng-hide">
+
+					<!-- incomplete items  -->
+					<button
+					ng-show="obj.completed === 0" 
+					class="ui mini grey button ng-hide">
+						<i class="warning icon"></i>Incomplete
+					</button>
+
+					<!-- present to agent button -->
+					<button
+					ng-click="modify('present', obj.id)"
+					ng-show="obj.completed === 1 && obj.presented === 0 && ( obj.lead_username === userinfo.username || userinfo.type === 'Manager' )"  
+					class="ui mini violet button ng-hide">
+						<i class="check icon"></i>Present
+					</button>
+					
+					<!-- pending agent acceptance -->
+					<button
+					ng-show="obj.presented === 1 && obj.accepted === 0" 
+					class="ui mini red button ng-hide">
+						<i class="info circle icon"></i>Pending agent
+					</button>
+
+					<!-- presented and accepted -->
+					<button
+					ng-show="obj.presented === 1 && obj.accepted === 1"
+					class="ui mini green button ng-hide">
+						<i class="thumbs up icon"></i>Agent accepted
+					</button>
+				</td>
+
+				<!-- Agent Actions / Statuses -->
+				<td 
+				ng-show="userinfo.type === 'Agent'"
+				class="ng-hide">
+					<!-- accept checkin -->
+					<a
+					ng-show="obj.presented === 1 && obj.accepted === 0 && userinfo.emulating === 0" 
+					ng-click="accept(obj.id)" 
+					class="ui mini teal button ng-hide">
+						<i class="check icon"></i>Accept
+					</a>
+
+					<!-- pending agent acceptance (emulating agent) -->
+					<label 
+					ng-show="obj.presented === 1 && obj.accepted === 0 && userinfo.emulating === 1" 
+					class="ui mini grey button ng-hide">
+						<i class="info circle icon"></i>Pending Acceptance
+					</label>
+
+					<!-- present and accepted -->
+					<label 
+					ng-show="obj.presented === 1 && obj.accepted === 1" 
+					class="ui mini green button ng-hide">
+						<i class="thumbs up icon"></i>Accepted
+					</label>
+				</td>
+
+				<!-- username (lead) -->
+				<td
+				ng-show="userinfo.type === 'Supervisor' || userinfo.type === 'Manager'"
+				class="ng-hide">
+					{{ obj.agent_username }}
+				</td>
+
+				<!-- interaction date -->
+				<td>
+					{{ obj.interaction_date | date:'MM/dd/yy'}}
+				</td>
+
+				<!-- account number -->
+				<td>
+					a:{{ obj.account_number }}
+				</td>
+
+				<!-- contact type -->
+				<td>
+					{{ obj.contact_type }}
+				</td>
+
+				<!-- support number -->
+				<td>
+					{{ obj.support_number }}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

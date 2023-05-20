@@ -1,0 +1,152 @@
+<?php
+/**
+ * Phone Visitors
+ *
+ * This cron is responsible for updating the information inside of the `calls_current_visitors` table with two different API calls.
+ * realtime/callers is information about the callers in queue. This data is used in conjunction with queues...
+ * realtime/queues is information about the queues, their members, and the callers as well.
+ * 
+ * Using both of these API calls, we will upsert data once to the calls_current_visitors table all of the information agents need for caller-info, etc.
+ * This cron is run every minute, however, the script will hit the API as many times as possible within that minute, sleeping for 4 seconds after each call.
+ * This essentially amounts to a 5-second interval for data pull / cleanup.
+ */
+require '../application/model/AstronomerRealtime.php';
+require '../application/model/Calls.php';
+require '../application/model/Logger.php';
+
+$AstronomerRealtime = new AstronomerRealtime($this->db);
+$Calls = new Calls($this->db);
+$Cron = new Cron();
+$Logger = new Logger();
+
+// the first time the script is being run (via cron or command line tests)
+$start = time();
+
+// the difference between start and now is zero, at the moment
+$diff = 0;
+$sleepInterval = 4;
+
+// if we are within the 1 minute of this cron running, loop over again.
+while($diff < 60) {
+
+	// api calls
+	$queues_result = $Cron->astronomerCurl('https://astronomer.mtvoip.net/api/realtime/queues');
+	$callers_result = $Cron->astronomerCurl('https://astronomer.mtvoip.net/api/realtime/callers');
+
+	// logging non-200s
+	$Logger->logAPI($queues_result->httpcode);
+	$Logger->logAPI($callers_result->httpcode);
+
+	// used for mapping a device number to a caller's id.
+	$device_number_MAPTO_callers_id = array();
+
+	// iterate through queues
+	foreach($queues_result->data as $key => $object) {
+
+		// queue payload
+		$payload = new stdClass();
+		$payload->number = $object->number;
+		$payload->name = $object->name;
+		$payload->longest_hold_time = $object->longest_hold_time;
+		$payload->estimated_hold_time = $object->estimated_hold_time;
+
+		// upsert queues to `astronomer_realtime_queues`
+		$AstronomerRealtime->upsertRealtimeQueue($payload);
+
+		// upsert members to `astronomer_realtime_queues_members`
+		// members runs before callers because within members is a callers array (confusing huh?), and we will assign the device_number to the callers_id this way.
+	    if(!empty($object->members)) {
+	        foreach($object->members as $member_key => $member_object) {
+
+	            $member = new stdClass();
+	            $member->fk_queue_number = $payload->number;
+				$member->device_number = $member_object->device_number;
+				$member->name = $member_object->name;
+				$member->extension = $member_object->extension;
+				$member->paused = $member_object->paused;
+				$member->time_since_last_call = $member_object->time_since_last_call;
+
+				if(!empty($member_object->callers)) {
+					// device number (key) : callers_id (value)
+					$device_number_MAPTO_callers_id[$member_object->callers[0]] = $member->device_number;
+				}
+
+				$AstronomerRealtime->upsertRealtimeMember($member);
+	        }
+	    }
+
+		// upsert callers to `astronomer_realtime_queues_callers`
+		if(!empty($object->callers)) {
+			foreach($object->callers as $caller_key => $caller_object) {
+
+				$caller = new stdClass();
+				$caller->fk_queue_number = $payload->number;
+				$caller->callers_id = $caller_object->id;
+				if(isset($device_number_MAPTO_callers_id[$caller->callers_id])) {
+					$caller->device_number = $device_number_MAPTO_callers_id[$caller->callers_id];
+				} else {
+					$caller->device_number = NULL;
+				}
+				$caller->hold_time = $caller_object->hold_time;
+				$caller->talk_time = $caller_object->talk_time;
+				$caller->caller_id = $caller_object->caller_id;
+				$caller->waiting = $caller_object->waiting;
+				$caller->account_id = $caller_object->account_id;
+				$caller->contact_id = $caller_object->contact_id;
+				$caller->reason = $caller_object->reason;
+
+				$AstronomerRealtime->upsertRealtimeCaller($caller);
+			}
+		}
+	}
+
+	// iterate through callers
+	foreach($callers_result->data->callers as $visitor) {
+
+		if(!is_null($visitor->joined_at)) {
+
+			$joined_at = date('Y-m-d H:i:s', strtotime($visitor->joined_at));
+
+			if(!is_null($visitor->answered_at)) {
+				$answered_at = date('Y-m-d H:i:s', strtotime($visitor->answered_at));
+			}
+			else {
+				$answered_at = NULL;
+			}
+
+			// update calls table with contact and account ID.
+			if(isset($visitor->account_id) || isset($visitor->contact_id)) {
+
+				$subPayload = new stdClass();
+				$subPayload->contact_id = @$visitor->contact_id;
+				$subPayload->account_id = @$visitor->account_id;
+				$subPayload->call_id = $visitor->call_id;
+
+				$Calls->updateCallAccountContactID($subPayload);
+			}
+
+			$payload = new stdClass();
+			$payload->callers_id = @$visitor->id;
+			$payload->caller_id_verbose = @$visitor->caller_id;
+			$payload->joined_at = $joined_at;
+			$payload->answered_at = $answered_at;
+			$payload->call_id = @$visitor->call_id;
+
+			$AstronomerRealtime->upsertRealtimeCaller2($payload);
+		}
+	}
+
+	// if 7 days passes and the queue has not been updated, let's remove it. 
+	// in case something is wrong with the API, we can give the system time to update these queues
+	// because if they are removed, workflow will basically break and we'll need to re-enter the department that each queue belongs to
+	// since that is manually done.
+	$Cron->cleanTable('astronomer_realtime_queues', 604800);
+	// these two tables, specifically the callers table need to be updated more frequently.
+	$Cron->cleanTable('astronomer_realtime_queues_callers', $sleepInterval);
+	$Cron->cleanTable('astronomer_realtime_queues_members', $sleepInterval);
+
+	// find the difference in seconds between now and the very first time this script was run
+	$diff = strtotime('now') - $start;
+
+	sleep($sleepInterval);
+}
